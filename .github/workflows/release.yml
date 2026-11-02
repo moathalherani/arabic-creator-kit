@@ -1,0 +1,30 @@
+name: Release to npm
+
+# Publishes any package whose version in package.json is not on npm yet.
+# Setup (once): add an npm "Automation" token as the repository secret NPM_TOKEN.
+# Release: bump "version" in packages/<name>/package.json, commit, then run this
+# workflow from the Actions tab (or push a tag like v0.1.0).
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm test
+      - run: npm run check:skills
+      - run: node scripts/publish.js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

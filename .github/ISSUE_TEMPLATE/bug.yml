@@ -1,0 +1,27 @@
+name: Bug report / مشكلة
+description: Something does not work as described.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - arabic-hooks
+        - arabic-seo
+        - arabic-captions
+        - skills
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the input (text, SRT snippet, slug) and the output you got.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version and Node version
+      placeholder: arabic-captions 0.1.0, Node 22

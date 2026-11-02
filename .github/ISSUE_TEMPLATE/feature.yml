@@ -1,0 +1,16 @@
+name: Idea / فكرة
+description: Suggest a feature, a new skill or a new tool for Arabic creators and developers.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should it do, and who is it for?
+    validations:
+      required: true
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to build this myself (we'll help you get it merged).

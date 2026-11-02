@@ -1,0 +1,23 @@
+{
+  "name": "arabic-creator-kit",
+  "private": true,
+  "description": "Open-source tools for Arabic content creators and developers: hooks, bilingual SEO, Reels captions and Claude Skills.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test packages/*/test/*.test.js",
+    "check:skills": "node scripts/check-skills.js",
+    "check": "npm test && npm run check:skills"
+  }
+}

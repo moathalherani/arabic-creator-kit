@@ -1,0 +1,34 @@
+name: "هوكس بلهجتي / Hooks in my dialect"
+description: Suggest hooks in a dialect (Egyptian, Gulf, Syrian, Maghrebi, Fusha…) or more hooks in an existing one.
+labels: ["hooks", "good first issue"]
+body:
+  - type: dropdown
+    id: dialect
+    attributes:
+      label: Dialect / اللهجة
+      options:
+        - مصري eg
+        - خليجي gulf
+        - سوري sy
+        - مغاربي ma
+        - فصحى msa
+        - أردني jo
+        - Other / غير
+    validations:
+      required: true
+  - type: textarea
+    id: hooks
+    attributes:
+      label: Hooks / الهوكس
+      description: One per line. Add the category (shock, curiosity, promise, challenge, story) and an English translation if you can.
+      placeholder: |
+        curiosity | في سبب محدش بيقولهولك… | There's a reason nobody tells you…
+    validations:
+      required: true
+  - type: checkboxes
+    id: own
+    attributes:
+      label: Original work
+      options:
+        - label: These are my own lines (not copied from another creator) and I'm fine with them being MIT licensed.
+          required: true

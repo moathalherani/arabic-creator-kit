@@ -1,0 +1,49 @@
+{
+  "name": "arabic-captions",
+  "version": "0.1.0",
+  "description": "Turn SRT/VTT subtitles into short keyword captions for Reels, TikTok and Shorts, with correct Arabic + English (bidi) rendering, Latin digits, filler removal and ASS output for ffmpeg. Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "bin": {
+    "arabic-captions": "./src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "captions",
+    "subtitles",
+    "srt",
+    "vtt",
+    "ass",
+    "ffmpeg",
+    "reels",
+    "tiktok",
+    "bidi",
+    "rtl",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-captions#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-captions"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

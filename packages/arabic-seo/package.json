@@ -1,0 +1,44 @@
+{
+  "name": "arabic-seo",
+  "version": "0.1.0",
+  "description": "SEO helpers for Arabic + English websites: readable Arabic slugs, hreflang, safe JSON-LD (Person, Article, FAQ, Video), digit and tashkeel normalization. Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "seo",
+    "slug",
+    "slugify",
+    "hreflang",
+    "json-ld",
+    "schema.org",
+    "rtl",
+    "i18n",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-seo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-seo"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

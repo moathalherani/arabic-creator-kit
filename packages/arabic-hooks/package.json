@@ -1,0 +1,48 @@
+{
+  "name": "arabic-hooks",
+  "version": "0.1.0",
+  "description": "Arabic + English video hooks for Reels, TikTok and Shorts: a curated dataset, fill-in templates and a hook scorer. Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./hooks.json": "./src/hooks.json"
+  },
+  "bin": {
+    "arabic-hooks": "./src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "hooks",
+    "reels",
+    "tiktok",
+    "shorts",
+    "content-creator",
+    "copywriting",
+    "social-media",
+    "عربي",
+    "هوك"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-hooks#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-hooks"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}
