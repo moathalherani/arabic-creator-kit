@@ -1,4 +1,6 @@
-// Publishes every workspace package whose current version is not on npm yet.
+// Stages every workspace package whose current version is not on npm yet, with
+// `npm stage publish`. A maintainer then approves each staged version with 2FA on
+// npmjs.com (Staged Packages) or with `npm stage approve <id>`.
 // Run in CI with NODE_AUTH_TOKEN set. Pass --dry-run to only print what would happen.
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
@@ -22,8 +24,8 @@ for (const dir of readdirSync(root)) {
     console.log(`skip ${name}@${version} (already published)`);
     continue;
   }
-  console.log(`${dry ? "would publish" : "publishing"} ${name}@${version}`);
+  console.log(`${dry ? "would stage" : "staging"} ${name}@${version}`);
   if (!dry) {
-    execFileSync("npm", ["publish", "--access", "public", "--provenance"], { cwd: pkgDir, stdio: "inherit" });
+    execFileSync("npm", ["stage", "publish", "--access", "public", "--provenance"], { cwd: pkgDir, stdio: "inherit" });
   }
 }

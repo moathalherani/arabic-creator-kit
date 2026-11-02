@@ -1,9 +1,11 @@
 name: Release to npm
 
-# Publishes any package whose version in package.json is not on npm yet.
-# Setup (once): add an npm "Automation" token as the repository secret NPM_TOKEN.
-# Release: bump "version" in packages/<name>/package.json, commit, then run this
-# workflow from the Actions tab (or push a tag like v0.1.0).
+# Stages any package whose version in package.json is not on npm yet (npm staged publishing).
+# Setup (once): add an npm granular token ("Read and write (stage only)" is enough) as the
+# repository secret NPM_TOKEN.
+# Release: bump "version" in packages/<name>/package.json, commit, run this workflow from the
+# Actions tab (or push a tag like v0.1.0), then approve each staged version with 2FA on
+# npmjs.com under Staged Packages.
 
 on:
   workflow_dispatch:
@@ -23,6 +25,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: npm --version
       - run: npm test
       - run: npm run check:skills
       - run: node scripts/publish.js
