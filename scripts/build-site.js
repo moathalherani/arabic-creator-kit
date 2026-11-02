@@ -92,6 +92,7 @@ const NAV = [
   ["hijri/", "التاريخ الهجري"],
   ["slug/", "رابط عربي"],
   ["skills/", "Claude Skills"],
+  ["contribute/", "ضيف هوكك"],
 ];
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -243,6 +244,77 @@ const skillsHtml = `${head({
 </html>
 `;
 writeFileSync(join(zipDir, "index.html"), skillsHtml);
+
+/* contribute page: write a hook, open GitHub with the file ready */
+const cUrl = `${BASE}contribute/`;
+urls.push(cUrl);
+const cDesc = "ضيف هوك بلهجتك لمكتبة هوكس عربية مفتوحة المصدر. اكتبه، اختار اللهجة، وبكبسة بيفتحلك GitHub والملف جاهز. اسمك بينضاف للمساهمين.";
+const cFaq = [
+  { question: "لازم أعرف برمجة؟", answer: "لا. بتكتب الهوك هون، وبتكبس زر، وGitHub بيعمل الباقي. بس بدك حساب GitHub مجاني." },
+  { question: "شو بصير بعد ما أبعته؟", answer: "بنراجعه، وإذا تمام بندمجه. بعدها بيصير جزء من حزمة arabic-hooks على npm ومن أداة تقييم الهوك، واسمك بيطلع بقائمة المساهمين." },
+  { question: "شو بيعتبر هوك منيح؟", answer: "جملة وحدة قصيرة (12 كلمة أو أقل)، بتبلش بالفكرة مش بالسلام، وفيها سؤال أو رقم أو مقارنة بتخلي المشاهد يكمّل. لازم تكون من كتابتك." },
+  { question: "ما بدي أعمل حساب GitHub", answer: "افتح Issue اسمه «هوكس بلهجتي» على GitHub، أو احكيلنا، وبنضيفه إحنا باسمك." },
+];
+const cHtml = `${head({
+  title: "ضيف هوكك بلهجتك | Arabic Creator Kit",
+  description: cDesc,
+  url: cUrl,
+  depth: 1,
+  jsonld: [faqJsonLd(cFaq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "ضيف هوكك", url: cUrl }])],
+})}
+<body>
+  ${header(1, "contribute/")}
+  <main>
+    <section class="page-head">
+      <h1>ضيف هوكك بلهجتك</h1>
+      <p class="lead">المكتبة فيها هوكس أردنية بس. بدنا مصري وخليجي وسوري ومغاربي وفصحى. اكتب هوك واحد من عندك، واسمك بينضاف للمساهمين بالمشروع.</p>
+      <ul class="dialect-counts" id="dialect-counts" aria-label="عدد الهوكس بكل لهجة"></ul>
+    </section>
+    <section class="tool solo contribute-tool" aria-labelledby="c-title">
+      <div class="scorer">
+        <h2 id="c-title" class="visually-hidden">اكتب الهوك</h2>
+        <label class="field-label" for="c-ar">الهوك (سطر واحد، من كتابتك)</label>
+        <textarea id="c-ar" rows="2" maxlength="200" placeholder="مثلاً: في سبب محدش بيقولهولك عن الريلز…"></textarea>
+        <div class="row">
+          <label class="stack"><span class="field-label">اللهجة</span><select id="c-dialect"><option value="">اختار</option></select></label>
+          <label class="stack"><span class="field-label">النوع</span><select id="c-category"></select></label>
+        </div>
+        <label class="field-label" for="c-en">الترجمة بالإنجليزي (اختياري)</label>
+        <input id="c-en" dir="ltr" maxlength="200" placeholder="There's a reason nobody tells you about reels…">
+        <div class="scorer-out">
+          <output class="score" id="c-score" aria-live="polite">–</output>
+          <div class="score-side"><ul class="tips" id="c-tips"></ul></div>
+        </div>
+        <ul class="problems" id="c-problems" aria-live="polite"></ul>
+        <div class="row">
+          <a class="btn" id="c-go" href="#" target="_blank" rel="noopener" aria-disabled="true">افتح GitHub والملف جاهز</a>
+          <button class="btn ghost" id="c-copy" type="button" disabled>انسخ الملف</button>
+        </div>
+        <details class="json-preview"><summary>شوف الملف</summary><pre dir="ltr" id="c-json"></pre></details>
+      </div>
+    </section>
+    <section class="page-body">
+      <h2>3 خطوات وبس</h2>
+      <ol class="steps">
+        <li><b>اكتب الهوك</b> فوق واختار لهجتك. الرقم بيقلك قديش قوي.</li>
+        <li><b>اكبس «افتح GitHub»</b>. إذا ما عندك حساب اعمل واحد مجاني. الملف بيكون مكتوب جاهز.</li>
+        <li><b>اكبس Commit changes ثم Propose changes ثم Create pull request</b>. خلص، بنراجعه وبندمجه.</li>
+      </ol>
+      <p>بعد الدمج الهوك بيصير جزء من <a href="https://www.npmjs.com/package/arabic-hooks">arabic-hooks</a> ومن <a href="../hook/">أداة تقييم الهوك</a>، واسمك بيطلع بـ <a href="${REPO}/graphs/contributors">قائمة المساهمين</a>.</p>
+      <p>بتعرف تبرمج؟ في كمان <a href="${REPO}/contribute">مهام سهلة للمبتدئين</a> و<a href="${REPO}/blob/main/CONTRIBUTING.md">دليل المساهمة</a>.</p>
+      <h2>المساهمين</h2>
+      <a href="${REPO}/graphs/contributors"><img class="contributors" src="https://contrib.rocks/image?repo=moathalherani/arabic-creator-kit" alt="صور المساهمين بالمشروع" loading="lazy"></a>
+    </section>
+    ${faqHtml(cFaq)}
+    ${related(1, "contribute/")}
+  </main>
+  ${FOOT}
+  <script type="module" src="../contribute.js"></script>
+</body>
+</html>
+`;
+mkdirSync(join(out, "contribute"), { recursive: true });
+writeFileSync(join(out, "contribute", "index.html"), cHtml);
 
 /* home: add SEO head tags and the tools index */
 const homeUrl = BASE;

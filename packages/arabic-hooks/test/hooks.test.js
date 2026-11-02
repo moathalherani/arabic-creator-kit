@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   hooks,
   CATEGORIES,
+  DIALECTS,
   getHooks,
   getHookById,
   randomHook,
@@ -39,7 +40,9 @@ test("dataset is well formed", () => {
     assert.match(h.id, /^[a-z]+(-[a-z]+)?-\d{3}$/);
     assert.ok(!ids.has(h.id), `duplicate id ${h.id}`);
     ids.add(h.id);
-    assert.ok(h.ar.trim() && h.en.trim(), h.id);
+    assert.ok(h.ar.trim(), h.id);
+    assert.equal(typeof h.en, "string", `${h.id} en must be a string (it may be empty for community hooks)`);
+    assert.ok(Object.hasOwn(DIALECTS, h.dialect), `${h.id} unknown dialect ${h.dialect}`);
     assert.match(h.ar, /[؀-ۿ]/, `${h.id} ar text must be Arabic`);
     assert.ok(h.dialect, h.id);
   }

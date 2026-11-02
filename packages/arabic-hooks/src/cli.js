@@ -16,7 +16,7 @@ const args = process.argv.slice(2);
 const en = args.includes("--en");
 const rest = args.filter((a) => a !== "--en");
 const [cmd = "random", arg] = rest;
-const pick = (h) => (en ? h.en : h.ar);
+const pick = (h) => (en ? h.en || h.ar : h.ar);
 
 try {
   if (cmd === "-h" || cmd === "--help" || cmd === "help") {

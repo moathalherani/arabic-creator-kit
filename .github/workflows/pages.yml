@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # to commit community hooks merged from contrib/hooks
   pages: write
   id-token: write
 
@@ -26,6 +26,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Move merged community hooks from contrib/hooks into the dataset
+        run: |
+          node scripts/merge-hooks.js
+          if [ -n "$(git status --porcelain packages/arabic-hooks contrib/hooks)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add packages/arabic-hooks/src/hooks-data.js contrib/hooks
+            git commit -m "Add community hooks from contrib/hooks"
+            git push
+          fi
       - run: npm test
       - run: node scripts/build-site.js
       - uses: actions/configure-pages@v5

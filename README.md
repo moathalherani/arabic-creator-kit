@@ -13,7 +13,7 @@
 
 **[جرّب الأدوات بمتصفحك ← Try it in your browser](https://moathalherani.github.io/arabic-creator-kit/)**
 
-[تقييم الهوك](https://moathalherani.github.io/arabic-creator-kit/hook/) · [المبلغ بالحروف](https://moathalherani.github.io/arabic-creator-kit/tafqeet/) · [كابشن الريلز](https://moathalherani.github.io/arabic-creator-kit/captions/) · [هاشتاقات](https://moathalherani.github.io/arabic-creator-kit/hashtags/) · [ميلادي ↔ هجري](https://moathalherani.github.io/arabic-creator-kit/hijri/) · [رابط عربي](https://moathalherani.github.io/arabic-creator-kit/slug/) · [Claude Skills](https://moathalherani.github.io/arabic-creator-kit/skills/)
+[تقييم الهوك](https://moathalherani.github.io/arabic-creator-kit/hook/) · [المبلغ بالحروف](https://moathalherani.github.io/arabic-creator-kit/tafqeet/) · [كابشن الريلز](https://moathalherani.github.io/arabic-creator-kit/captions/) · [هاشتاقات](https://moathalherani.github.io/arabic-creator-kit/hashtags/) · [ميلادي ↔ هجري](https://moathalherani.github.io/arabic-creator-kit/hijri/) · [رابط عربي](https://moathalherani.github.io/arabic-creator-kit/slug/) · [Claude Skills](https://moathalherani.github.io/arabic-creator-kit/skills/) · [**ضيف هوكك**](https://moathalherani.github.io/arabic-creator-kit/contribute/)
 
 </div>
 
@@ -88,7 +88,15 @@ Most creator tools are built for English. Arabic adds right-to-left text mixed w
 
 ## Contributing / ساهم
 
-The quickest way to help: **add hooks in your dialect** ([Egyptian](https://github.com/moathalherani/arabic-creator-kit/issues/1), [Gulf](https://github.com/moathalherani/arabic-creator-kit/issues/2), [Syrian](https://github.com/moathalherani/arabic-creator-kit/issues/3), [Maghrebi](https://github.com/moathalherani/arabic-creator-kit/issues/4), [Fusha](https://github.com/moathalherani/arabic-creator-kit/issues/5)). See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and ideas are welcome in Arabic or English.
+The quickest way to help: **add a hook in your dialect** on the **[ضيف هوكك page](https://moathalherani.github.io/arabic-creator-kit/contribute/)**. Write it, pick your dialect, and it opens GitHub with the file ready. No coding needed. We need Egyptian, Gulf, Syrian, Maghrebi and Fusha.
+
+أسهل مساهمة: افتح [صفحة ضيف هوكك](https://moathalherani.github.io/arabic-creator-kit/contribute/)، اكتب هوك بلهجتك، وبكبسة بيفتحلك GitHub والملف جاهز. ما بدها برمجة.
+
+Developers: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [good first issues](https://github.com/moathalherani/arabic-creator-kit/contribute). Issues and ideas are welcome in Arabic or English.
+
+### Contributors / المساهمين
+
+<a href="https://github.com/moathalherani/arabic-creator-kit/graphs/contributors"><img src="https://contrib.rocks/image?repo=moathalherani/arabic-creator-kit" alt="Contributors"></a>
 
 ## License
 

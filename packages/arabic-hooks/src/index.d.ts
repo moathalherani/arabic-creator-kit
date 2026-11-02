@@ -6,6 +6,7 @@ export interface Hook {
   readonly category: HookCategory;
   readonly dialect: DialectCode;
   readonly ar: string;
+  /** English translation. May be an empty string for community hooks added without one. */
   readonly en: string;
 }
 

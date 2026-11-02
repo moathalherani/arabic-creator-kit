@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "ضيف هوك بلهجتك / Add a hook in your dialect (fastest)"
+    url: https://moathalherani.github.io/arabic-creator-kit/contribute/
+    about: Write your hook and open a ready pull request in one click. No coding needed.
