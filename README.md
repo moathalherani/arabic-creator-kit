@@ -8,6 +8,8 @@
 
 [![CI](https://github.com/moathalherani/arabic-creator-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/moathalherani/arabic-creator-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![npm downloads](https://img.shields.io/npm/dm/arabic-hooks.svg?label=arabic-hooks)](https://www.npmjs.com/package/arabic-hooks)
+[![npm downloads](https://img.shields.io/npm/dm/arabic-tafqeet.svg?label=arabic-tafqeet)](https://www.npmjs.com/package/arabic-tafqeet)
 
 **[جرّب الأدوات بمتصفحك ← Try it in your browser](https://moathalherani.github.io/arabic-creator-kit/)**
 
