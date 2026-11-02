@@ -34,3 +34,10 @@ jobs:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Tell Bing and other IndexNow search engines about the pages
+        if: success()
+        continue-on-error: true
+        run: |
+          urls=$(grep -o '<loc>[^<]*</loc>' _site/sitemap.xml | sed 's#</\?loc>##g' | jq -R . | jq -s .)
+          jq -n --argjson urls "$urls" '{host:"moathalherani.github.io", key:"851d477d75252872d5cd3f0f0af68add", keyLocation:"https://moathalherani.github.io/arabic-creator-kit/851d477d75252872d5cd3f0f0af68add.txt", urlList:$urls}' > indexnow.json
+          curl -sS -o /dev/null -w "IndexNow HTTP %{http_code}\n" -X POST https://api.indexnow.org/indexnow -H "Content-Type: application/json; charset=utf-8" --data @indexnow.json
