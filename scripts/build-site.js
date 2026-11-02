@@ -100,7 +100,7 @@ const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 const ICON = home.match(/<link rel="icon"[^>]*>/)[0];
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-function head({ title, description, url, depth, jsonld }) {
+function head({ title, description, url, depth, jsonld, image = "og.png" }) {
   const up = "../".repeat(depth);
   return `<!doctype html>
 <html lang="ar" dir="rtl">
@@ -116,7 +116,7 @@ function head({ title, description, url, depth, jsonld }) {
   <meta property="og:title" content="${esc(title)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${url}">
-  <meta property="og:image" content="${BASE}og.png">
+  <meta property="og:image" content="${BASE}${image}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
@@ -253,13 +253,14 @@ const cFaq = [
   { question: "لازم أعرف برمجة؟", answer: "لا. بتكتب الهوك هون، وبتكبس زر، وGitHub بيعمل الباقي. بس بدك حساب GitHub مجاني." },
   { question: "شو بصير بعد ما أبعته؟", answer: "بنراجعه، وإذا تمام بندمجه. بعدها بيصير جزء من حزمة arabic-hooks على npm ومن أداة تقييم الهوك، واسمك بيطلع بقائمة المساهمين." },
   { question: "شو بيعتبر هوك منيح؟", answer: "جملة وحدة قصيرة (12 كلمة أو أقل)، بتبلش بالفكرة مش بالسلام، وفيها سؤال أو رقم أو مقارنة بتخلي المشاهد يكمّل. لازم تكون من كتابتك." },
-  { question: "ما بدي أعمل حساب GitHub", answer: "افتح Issue اسمه «هوكس بلهجتي» على GitHub، أو احكيلنا، وبنضيفه إحنا باسمك." },
+  { question: "ما بدي أعمل حساب GitHub", answer: "ابعته بتعليق على آخر ريل بإنستغرام @moath.alherani مع هاشتاق #هوك_بلهجتك، أو افتح Issue اسمه «هوكس بلهجتي» على GitHub، وبنضيفه إحنا باسمك." },
 ];
 const cHtml = `${head({
   title: "ضيف هوكك بلهجتك | Arabic Creator Kit",
   description: cDesc,
   url: cUrl,
   depth: 1,
+  image: "og-contribute.png",
   jsonld: [faqJsonLd(cFaq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "ضيف هوكك", url: cUrl }])],
 })}
 <body>
@@ -267,6 +268,7 @@ const cHtml = `${head({
   <main>
     <section class="page-head">
       <h1>ضيف هوكك بلهجتك</h1>
+      <p class="challenge-tag">#هوك_بلهجتك</p>
       <p class="lead">المكتبة فيها هوكس أردنية بس. بدنا مصري وخليجي وسوري ومغاربي وفصحى. اكتب هوك واحد من عندك، واسمك بينضاف للمساهمين بالمشروع.</p>
       <ul class="dialect-counts" id="dialect-counts" aria-label="عدد الهوكس بكل لهجة"></ul>
     </section>
@@ -291,6 +293,7 @@ const cHtml = `${head({
           <button class="btn ghost" id="c-copy" type="button" disabled>انسخ الملف</button>
         </div>
         <details class="json-preview"><summary>شوف الملف</summary><pre dir="ltr" id="c-json"></pre></details>
+        <div class="share" id="c-share" aria-label="شارك الهوك"></div>
       </div>
     </section>
     <section class="page-body">

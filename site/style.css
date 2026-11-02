@@ -301,3 +301,11 @@ a.btn[aria-disabled="true"], .btn:disabled { opacity: 0.45; pointer-events: none
 .dialect-counts li.empty { border-color: var(--warn); border-style: dashed; }
 .dialect-counts li.empty span { color: var(--warn); }
 img.contributors { max-width: 100%; height: auto; margin-top: 8px; }
+
+/* share row */
+.share { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.share:empty { display: none; }
+.share-label { color: var(--muted); font-size: 0.9rem; margin-inline-end: 4px; }
+.chip { font: inherit; font-size: 0.9rem; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); text-decoration: none; cursor: pointer; }
+.chip:hover { border-color: var(--leaf); color: var(--leaf); }
+.challenge-tag { display: inline-block; font-weight: 600; color: var(--leaf); }

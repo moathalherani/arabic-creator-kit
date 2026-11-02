@@ -3,6 +3,7 @@ import { amountToWords, CURRENCIES } from "./lib/arabic-tafqeet/index.js";
 import { parseSubtitles, keywordCaptions, toSrt, toAss, formatTimestamp, fixBidi } from "./lib/arabic-captions/index.js";
 import { checkPost, hashtag, PLATFORMS } from "./lib/arabic-social/index.js";
 import { slugify } from "./lib/arabic-seo/index.js";
+import { renderShare } from "./share.js";
 import { formatDate, formatHijri, islamicOccasions, toHijri, fromHijri, HIJRI_MONTHS } from "./lib/arabic-dates/index.js";
 
 const $ = (id) => document.getElementById(id);
@@ -25,12 +26,22 @@ if ($("hook-input")) {
     tips.replaceChildren(
       ...(r.tips.length ? r.tips.map((t) => el("li", { textContent: t.ar })) : [el("li", { className: "good", textContent: "قوي. صوّره وشوف النتيجة." })]),
     );
+    const text = $("hook-input").value.trim();
+    if ($("hook-share") && text && $("hook-input").dataset.touched) {
+      renderShare($("hook-share"), {
+        label: "تحدّى صحابك",
+        text: `هوكي أخذ ${r.score}/100 بمقيّم الهوك 👀\n«${text.slice(0, 120)}»\nقيّم هوكك وشوف قديش بتاخذ #هوك_بلهجتك`,
+        url: "https://moathalherani.github.io/arabic-creator-kit/hook/",
+      });
+    } else if ($("hook-share")) $("hook-share").replaceChildren();
   }
+  $("hook-input").addEventListener("input", () => ($("hook-input").dataset.touched = "1"));
   $("hook-input").addEventListener("input", renderScore);
   $("hook-random").addEventListener("click", () => {
     const h = randomHook({ category: $("hook-category").value || undefined });
     if (h) {
       $("hook-input").value = h.ar;
+      delete $("hook-input").dataset.touched;
       renderScore();
     }
   });

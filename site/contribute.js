@@ -1,6 +1,7 @@
 // "Add your hook" page: turns the form into one JSON file and opens GitHub's new-file editor
 // with it filled in, so a contributor only has to press "Commit changes…" then "Create pull request".
 import { scoreHook, hooks, CATEGORY_LABELS } from "./lib/arabic-hooks/index.js";
+import { renderShare } from "./share.js";
 
 const REPO = "https://github.com/moathalherani/arabic-creator-kit";
 const $ = (id) => document.getElementById(id);
@@ -58,6 +59,13 @@ function render() {
   go.tabIndex = ok ? 0 : -1;
   go.href = ok ? `${REPO}/new/main/contrib/hooks?filename=${encodeURIComponent(fileName())}&value=${encodeURIComponent(json)}` : "#";
   $("c-copy").disabled = !ok;
+  if (ok) {
+    renderShare($("c-share"), {
+      label: "تحدّى صحابك",
+      text: `كتبت هوك بال${DIALECT_AR[e.dialect]} وأخذ ${r.score}/100 😎\n«${e.ar.slice(0, 120)}»\nمين بيكتب أقوى؟ ضيف هوكك بلهجتك #هوك_بلهجتك`,
+      url: "https://moathalherani.github.io/arabic-creator-kit/contribute/",
+    });
+  } else $("c-share").replaceChildren();
 }
 
 $("c-go").addEventListener("click", (ev) => {
