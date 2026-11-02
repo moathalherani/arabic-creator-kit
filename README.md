@@ -11,6 +11,8 @@
 
 **[جرّب الأدوات بمتصفحك ← Try it in your browser](https://moathalherani.github.io/arabic-creator-kit/)**
 
+[تقييم الهوك](https://moathalherani.github.io/arabic-creator-kit/hook/) · [المبلغ بالحروف](https://moathalherani.github.io/arabic-creator-kit/tafqeet/) · [كابشن الريلز](https://moathalherani.github.io/arabic-creator-kit/captions/) · [هاشتاقات](https://moathalherani.github.io/arabic-creator-kit/hashtags/) · [ميلادي ↔ هجري](https://moathalherani.github.io/arabic-creator-kit/hijri/) · [رابط عربي](https://moathalherani.github.io/arabic-creator-kit/slug/) · [Claude Skills](https://moathalherani.github.io/arabic-creator-kit/skills/)
+
 </div>
 
 ## Packages
