@@ -8,6 +8,8 @@
 
 [![CI](https://github.com/moathalherani/arabic-creator-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/moathalherani/arabic-creator-kit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Contributors](https://img.shields.io/github/contributors/moathalherani/arabic-creator-kit?label=contributors)](https://moathalherani.github.io/arabic-creator-kit/contribute/)
+[![Good first issues](https://img.shields.io/github/issues/moathalherani/arabic-creator-kit/good%20first%20issue?label=good%20first%20issues&color=7057ff)](https://github.com/moathalherani/arabic-creator-kit/contribute)
 [![npm downloads](https://img.shields.io/npm/dm/arabic-hooks.svg?label=arabic-hooks)](https://www.npmjs.com/package/arabic-hooks)
 [![npm downloads](https://img.shields.io/npm/dm/arabic-tafqeet.svg?label=arabic-tafqeet)](https://www.npmjs.com/package/arabic-tafqeet)
 
