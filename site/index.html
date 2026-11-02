@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arabic Creator Kit · أدوات صنّاع المحتوى العرب</title>
+  <meta name="description" content="أدوات مجانية ومفتوحة المصدر لصنّاع المحتوى العرب: قيّم الهوك، اكتب المبالغ بالحروف، كابشن للريلز، هاشتاقات، تاريخ هجري و13 Claude Skill.">
+  <meta property="og:title" content="Arabic Creator Kit">
+  <meta property="og:description" content="Open-source tools for Arabic content creators: hook scorer, tafqeet, Reels captions, hashtags, Hijri dates and 13 Claude Skills.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%233e6b4f%22/%3E%3Cpath d=%22M9 20c2 3 12 3 14-4%22 stroke=%22white%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">Arabic Creator Kit</a>
+    <nav aria-label="الأقسام">
+      <a href="#tools">الأدوات</a>
+      <a href="#skills">Claude Skills</a>
+      <a href="#contribute">ساهم</a>
+      <a href="https://github.com/moathalherani/arabic-creator-kit">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">أول 3 ثواني بتقرر كل إشي.</h1>
+        <p class="lead">اكتب الجملة اللي بتبلّش فيها الفيديو، وشوف قدّيش قوية وكيف تحسّنها. كل الأدوات هون مجانية ومفتوحة المصدر، وبتشتغل بمتصفحك بدون تسجيل.</p>
+        <p class="lead-en" lang="en" dir="ltr">Free, open-source tools for Arabic creators and the developers who build for them.</p>
+      </div>
+      <div class="scorer" id="scorer">
+        <label for="hook-input" class="field-label">الهوك تبعك</label>
+        <textarea id="hook-input" rows="3" spellcheck="false">مرحبا يا جماعة، اليوم رح نحكي عن موضوع مهم</textarea>
+        <div class="scorer-out">
+          <output id="hook-score" class="score" aria-live="polite">0</output>
+          <div class="score-side">
+            <div class="meter" aria-hidden="true"><span id="hook-meter"></span></div>
+            <ul id="hook-tips" class="tips"></ul>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" id="hook-random" class="btn">جيبلي هوك جاهز</button>
+          <select id="hook-category" aria-label="نوع الهوك">
+            <option value="">كل الأنواع</option>
+            <option value="shock">صدمة</option>
+            <option value="curiosity">فضول</option>
+            <option value="promise">وعد</option>
+            <option value="challenge">تحدّي</option>
+            <option value="story">قصة</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div id="tools">
+      <section class="tool" aria-labelledby="t-tafqeet">
+        <div class="tool-head">
+          <h2 id="t-tafqeet">المبلغ بالحروف</h2>
+          <p>للفواتير والشيكات والعقود. بيكتب المبلغ بقواعد المذكر والمؤنث والجمع الصحيحة.</p>
+          <code dir="ltr">npm i arabic-tafqeet</code>
+        </div>
+        <div class="tool-body">
+          <div class="row">
+            <input id="tq-amount" inputmode="decimal" value="1,250.75" aria-label="المبلغ" dir="ltr">
+            <select id="tq-currency" aria-label="العملة"></select>
+            <label class="check"><input type="checkbox" id="tq-only" checked> فقط … لا غير</label>
+          </div>
+          <output id="tq-out" class="result big" aria-live="polite"></output>
+          <button type="button" class="copy" data-copy="tq-out">انسخ</button>
+        </div>
+      </section>
+
+      <section class="tool" aria-labelledby="t-captions">
+        <div class="tool-head">
+          <h2 id="t-captions">كابشن الريلز بالكلمات</h2>
+          <p>الصق ملف SRT من أي برنامج، وبيطلعلك كابشن قصير، كل مرة 3 كلمات، وكلمة وحدة ملوّنة. بعدين نزّله واحرقه على الفيديو بـ ffmpeg.</p>
+          <code dir="ltr">npx arabic-captions talk.srt -f ass</code>
+        </div>
+        <div class="tool-body">
+          <textarea id="cap-in" rows="6" dir="ltr" spellcheck="false" aria-label="ملف SRT">1
+00:00:00,000 --> 00:00:03,000
+يعني جرّبت سيارة BYD Seal لمدة ٣٠ يوم
+
+2
+00:00:03,000 --> 00:00:06,000
+والنتيجة صدمتني بصراحة</textarea>
+          <div class="row">
+            <label class="inline">كلمات بكل كابشن <input id="cap-words" type="number" min="1" max="6" value="3" dir="ltr"></label>
+            <button type="button" class="btn ghost" id="cap-srt">نزّل SRT</button>
+            <button type="button" class="btn ghost" id="cap-ass">نزّل ASS</button>
+          </div>
+          <ol id="cap-out" class="captions" aria-live="polite"></ol>
+        </div>
+      </section>
+
+      <section class="tool" aria-labelledby="t-social">
+        <div class="tool-head">
+          <h2 id="t-social">افحص الكابشن قبل ما تنشر</h2>
+          <p>الطول حسب كل منصة، الهاشتاقات، الرموز المخفية اللي بتيجي من النسخ، وشو بيبيّن قبل «المزيد».</p>
+          <code dir="ltr">npm i arabic-social</code>
+        </div>
+        <div class="tool-body">
+          <select id="so-platform" aria-label="المنصة"></select>
+          <textarea id="so-in" rows="5" aria-label="الكابشن">جرّبت سيارة كهربائية 30 يوم بصيف دبي… هاي النتيجة
+
+السطر الثاني من الكابشن مع شوية تفاصيل.
+
+#سيارات_كهربائية #دبي #BYD</textarea>
+          <div id="so-out" class="report" aria-live="polite"></div>
+          <div class="row">
+            <input id="tag-in" value="صنّاع المحتوى ٢٠٢٦" aria-label="عبارة لهاشتاق">
+            <output id="tag-out" class="result"></output>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool" aria-labelledby="t-seo">
+        <div class="tool-head">
+          <h2 id="t-seo">رابط عربي مرتب</h2>
+          <p>لعناوين المقالات والصفحات. بيشيل التشكيل ويحوّل الأرقام، أو بيكتبه بحروف إنجليزية إذا المنصة ما بتقبل العربي.</p>
+          <code dir="ltr">npm i arabic-seo</code>
+        </div>
+        <div class="tool-body">
+          <input id="slug-in" value="دليل تطبيقات BYD الكامل ٢٠٢٦!" aria-label="العنوان">
+          <dl class="pairs">
+            <dt>بالعربي</dt><dd><output id="slug-ar" dir="auto"></output></dd>
+            <dt>بحروف إنجليزية</dt><dd><output id="slug-en" dir="ltr"></output></dd>
+          </dl>
+        </div>
+      </section>
+
+      <section class="tool" aria-labelledby="t-dates">
+        <div class="tool-head">
+          <h2 id="t-dates">التاريخ والمواسم</h2>
+          <p>تاريخ اليوم بأسماء الأشهر حسب بلدك، والهجري، ومواعيد رمضان والعيد المتوقعة لتخطيط المحتوى.</p>
+          <code dir="ltr">npm i arabic-dates</code>
+        </div>
+        <div class="tool-body">
+          <dl class="pairs">
+            <dt>اليوم (الشام)</dt><dd id="d-levant"></dd>
+            <dt>اليوم (الخليج ومصر)</dt><dd id="d-standard"></dd>
+            <dt>هجري</dt><dd id="d-hijri"></dd>
+          </dl>
+          <ul id="d-occasions" class="occasions"></ul>
+          <p class="note">المواعيد تقريبية حسب تقويم أم القرى، والإعلان الرسمي بيعتمد على رؤية الهلال.</p>
+        </div>
+      </section>
+    </div>
+
+    <section id="skills" class="skills" aria-labelledby="skills-title">
+      <div class="skills-head">
+        <h2 id="skills-title">13 مهارة جاهزة لـ Claude</h2>
+        <p>كل مهارة (Skill) بتعلّم Claude يكتب نوع محتوى معيّن بالعربي. نزّلها كملف ZIP وارفعها بتطبيق Claude من <bdi dir="ltr">Settings › Capabilities › Skills</bdi>. إذا بتستخدم Claude Code، انسخ المجلدات لـ <code dir="ltr">~/.claude/skills</code>.</p>
+        <a class="btn" href="skills/arabic-creator-skills.zip" download>نزّل الكل</a>
+      </div>
+      <ul id="skills-list" class="skills-list"></ul>
+    </section>
+
+    <section id="contribute" class="contribute" aria-labelledby="c-title">
+      <h2 id="c-title">ضيف هوك بلهجتك</h2>
+      <p>الهوكس الحالية بالأردني. بدنا مصري وخليجي وسوري ومغاربي وفصحى. اكتب هوكس بلهجتك بتعليق على GitHub، وبنضيفها باسمك.</p>
+      <div class="dialects">
+        <a href="https://github.com/moathalherani/arabic-creator-kit/issues/1">مصري</a>
+        <a href="https://github.com/moathalherani/arabic-creator-kit/issues/2">خليجي</a>
+        <a href="https://github.com/moathalherani/arabic-creator-kit/issues/3">سوري</a>
+        <a href="https://github.com/moathalherani/arabic-creator-kit/issues/4">مغاربي</a>
+        <a href="https://github.com/moathalherani/arabic-creator-kit/issues/5">فصحى</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>صنعه <a href="https://moathalherani.com">المهندس معاذ الهريني</a>، ومفتوح المصدر برخصة MIT.</p>
+    <p><a href="https://github.com/moathalherani/arabic-creator-kit">الكود على GitHub</a></p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

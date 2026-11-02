@@ -1,0 +1,48 @@
+{
+  "name": "arabic-tafqeet",
+  "version": "0.1.0",
+  "description": "Numbers and money amounts in Arabic words (تفقيط) for invoices, cheques and contracts: AED, SAR, QAR, OMR, KWD, BHD, JOD, EGP, USD and more, with correct gender and plural forms. Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "bin": {
+    "arabic-tafqeet": "./src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "tafqeet",
+    "number-to-words",
+    "numbers",
+    "invoice",
+    "cheque",
+    "currency",
+    "aed",
+    "sar",
+    "تفقيط",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-tafqeet#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-tafqeet"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

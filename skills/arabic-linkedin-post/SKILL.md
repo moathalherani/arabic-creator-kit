@@ -1,6 +1,6 @@
 ---
 name: arabic-linkedin-post
-description: Write LinkedIn posts in Arabic (or bilingual Arabic/English) from real professional experience: a strong first line, one lesson, proof and a question that invites comments. Use when someone asks for a LinkedIn post, "بوست لينكدإن", or wants to turn a work story into a post.
+description: Write LinkedIn posts in Arabic (or bilingual Arabic/English) from real professional experience, with a strong first line, one lesson, proof and a question that invites comments. Use when someone asks for a LinkedIn post, "بوست لينكدإن", or wants to turn a work story into a post.
 ---
 
 # Arabic LinkedIn post

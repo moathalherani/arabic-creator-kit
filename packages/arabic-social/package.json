@@ -1,0 +1,46 @@
+{
+  "name": "arabic-social",
+  "version": "0.1.0",
+  "description": "Caption helpers for Arabic creators: Arabic hashtags, per-platform limits (Instagram, TikTok, YouTube, X weighted count, LinkedIn…), \"…more\" previews, hidden-character cleanup and Instagram line breaks. Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "hashtags",
+    "instagram",
+    "tiktok",
+    "twitter",
+    "x",
+    "linkedin",
+    "caption",
+    "character-count",
+    "social-media",
+    "هاشتاق",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-social#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-social"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

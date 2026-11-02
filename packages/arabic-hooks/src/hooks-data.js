@@ -1,4 +1,6 @@
-[
+// Hook dataset. Each entry: id, category, dialect, ar, en.
+// Edit this file to add entries; run `npm test` before opening a pull request.
+export default [
   {
     "id": "shock-001",
     "category": "shock",
@@ -349,4 +351,4 @@
     "ar": "هاي أصعب لحظة مرّت عليّ بالشغل، وكيف طلعت منها.",
     "en": "This was the hardest moment of my career, and how I got out."
   }
-]
+];

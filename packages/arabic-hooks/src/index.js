@@ -1,7 +1,6 @@
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const DATA = require("./hooks.json");
+import DATA from "./hooks-data.js";
+import EXTRA_TEMPLATES from "./templates-data.js";
+import CTA_DATA from "./ctas-data.js";
 
 /** The five hook families used across the dataset. */
 export const CATEGORIES = Object.freeze(["shock", "curiosity", "promise", "challenge", "story"]);
@@ -91,7 +90,24 @@ export const templates = Object.freeze([
   { id: "t-before", category: "shock", ar: "ما تشتري {product} قبل ما تشوف هذا.", en: "Don't buy {product} before you see this." },
   { id: "t-years", category: "story", ar: "قبل {years} سنين كنت {past}. اليوم {now}.", en: "{years} years ago I was {past}. Today {now}." },
   { id: "t-under", category: "challenge", ar: "إذا عندك أقل من {number} {unit}، ما تتخطّى هالفيديو.", en: "Under {number} {unit}? Don't skip this." },
-]);
+  ...EXTRA_TEMPLATES,
+].map((t) => Object.freeze(t)));
+
+/** Call-to-action lines for the end of a video, by intent. */
+export const CTA_INTENTS = Object.freeze(["save", "comment", "share", "follow", "link", "dm", "try"]);
+export const ctas = Object.freeze(CTA_DATA.map((c) => Object.freeze({ ...c })));
+
+/**
+ * Get CTA lines, optionally for one intent.
+ * @param {{ intent?: string }} [options]
+ */
+export function getCtas(options = {}) {
+  const { intent } = options;
+  if (intent !== undefined && !CTA_INTENTS.includes(intent)) {
+    throw new RangeError(`Unknown intent "${intent}". Use one of: ${CTA_INTENTS.join(", ")}`);
+  }
+  return ctas.filter((c) => !intent || c.intent === intent);
+}
 
 /**
  * Replace {placeholders} in a template string or template object.
@@ -185,4 +201,4 @@ export function scoreHook(text) {
   return { score: Math.max(0, Math.min(100, score)), words: words.length, tips };
 }
 
-export default { hooks, CATEGORIES, CATEGORY_LABELS, DIALECTS, VIDEO_WEIGHTS, templates, getHooks, getHookById, randomHook, fillTemplate, scoreHook, normalize };
+export default { hooks, ctas, CTA_INTENTS, getCtas, CATEGORIES, CATEGORY_LABELS, DIALECTS, VIDEO_WEIGHTS, templates, getHooks, getHookById, randomHook, fillTemplate, scoreHook, normalize };

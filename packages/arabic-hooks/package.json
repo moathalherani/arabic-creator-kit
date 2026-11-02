@@ -10,7 +10,10 @@
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
-    "./hooks.json": "./src/hooks.json"
+    "./data": {
+      "types": "./src/hooks-data.d.ts",
+      "default": "./src/hooks-data.js"
+    }
   },
   "bin": {
     "arabic-hooks": "./src/cli.js"

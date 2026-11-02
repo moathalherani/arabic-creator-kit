@@ -31,6 +31,18 @@ scoreHook("مرحبا يا جماعة اليوم رح نحكي عن موضوع")
 // { score: 30, words: 8, tips: [{ ar: "ابدأ بالفكرة مباشرة…", en: "Start with the idea…" }, …] }
 ```
 
+## Endings that ask for one thing / خاتمة الفيديو
+
+```js
+import { getCtas, fillTemplate } from "arabic-hooks";
+
+getCtas({ intent: "save" })[0].ar; // "احفظ الفيديو عشان ترجعله وقت ما تحتاجه."
+fillTemplate(getCtas({ intent: "comment" })[0], { keyword: "دليل", gift: "الملف" });
+// "اكتب «دليل» بالتعليقات وببعتلك الملف."
+```
+
+Intents: `save`, `comment`, `share`, `follow`, `link`, `dm`, `try`. There are 30 hook templates and 14 call-to-action lines, all in Arabic and English.
+
 ## Categories / الأنواع
 
 | key | عربي | When to use |
@@ -47,7 +59,7 @@ scoreHook("مرحبا يا جماعة اليوم رح نحكي عن موضوع")
 { "id": "shock-001", "category": "shock", "dialect": "jo", "ar": "…", "en": "…" }
 ```
 
-The raw dataset is also exported as `arabic-hooks/hooks.json`.
+The raw dataset is also available as `import data from "arabic-hooks/data"`.
 
 ## How `scoreHook` works
 
@@ -55,7 +67,7 @@ It is a heuristic, not a prediction. It starts at 40 and checks: length (12 word
 
 ## Contribute a dialect / ساهم بلهجتك
 
-The first 50 hooks are Jordanian (`jo`). We want Egyptian, Gulf, Syrian, Maghrebi and Fusha versions. Open a pull request that adds entries to `src/hooks.json` with your dialect code. See [CONTRIBUTING](../../CONTRIBUTING.md).
+The first 50 hooks are Jordanian (`jo`). We want Egyptian, Gulf, Syrian, Maghrebi and Fusha versions. Open a pull request that adds entries to `src/hooks-data.js` with your dialect code. See [CONTRIBUTING](../../CONTRIBUTING.md).
 
 بدنا هوكس باللهجة المصرية والخليجية والسورية والمغاربية والفصحى. افتح Pull Request وضيف هوكس بلهجتك.
 

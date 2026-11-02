@@ -11,7 +11,25 @@ import {
   scoreHook,
   normalize,
   VIDEO_WEIGHTS,
+  ctas,
+  getCtas,
+  CTA_INTENTS,
 } from "../src/index.js";
+
+test("templates and CTAs are well formed", () => {
+  assert.ok(templates.length >= 30);
+  const ids = new Set();
+  for (const t of [...templates, ...ctas]) {
+    assert.ok(!ids.has(t.id), `duplicate ${t.id}`);
+    ids.add(t.id);
+    const ar = [...t.ar.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+    const en = [...t.en.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+    assert.deepEqual(ar, en, `${t.id} placeholders must match`);
+  }
+  for (const i of CTA_INTENTS) assert.ok(getCtas({ intent: i }).length > 0, i);
+  assert.throws(() => getCtas({ intent: "buy" }), RangeError);
+  assert.equal(fillTemplate(getCtas({ intent: "comment" })[0], { keyword: "دليل", gift: "الملف" }), "اكتب «دليل» بالتعليقات وببعتلك الملف.");
+});
 
 test("dataset is well formed", () => {
   assert.ok(hooks.length >= 50);

@@ -6,7 +6,7 @@ Thank you for helping Arabic creators and developers. Every contribution counts,
 
 ## Easiest first contribution: hooks in your dialect / أسهل مساهمة
 
-1. Fork the repo and open `packages/arabic-hooks/src/hooks.json`.
+1. Fork the repo and open `packages/arabic-hooks/src/hooks-data.js`.
 2. Add entries at the end, for example:
 
    ```json

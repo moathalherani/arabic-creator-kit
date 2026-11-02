@@ -26,6 +26,7 @@ for (const dir of dirs) {
     if (!desc || desc.length < 40) problems.push("description too short (say what it does and when to use it)");
     if (desc && desc.length > 1024) problems.push("description over 1024 characters");
     if (desc && /[<>]/.test(desc)) problems.push("description must not contain < or >");
+    if (desc && /: |#/.test(desc) && !/^["']/.test(desc)) problems.push('description contains ": " or "#", which breaks YAML; rephrase or quote it');
     if (text.slice(fm[0].length).trim().length < 200) problems.push("body is too thin");
   }
   if (problems.length) {

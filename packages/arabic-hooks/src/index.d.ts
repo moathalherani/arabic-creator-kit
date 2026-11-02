@@ -16,6 +16,19 @@ export interface HookTemplate {
   readonly en: string;
 }
 
+export type CtaIntent = "save" | "comment" | "share" | "follow" | "link" | "dm" | "try";
+
+export interface Cta {
+  readonly id: string;
+  readonly intent: CtaIntent;
+  readonly ar: string;
+  readonly en: string;
+}
+
+export declare const CTA_INTENTS: readonly CtaIntent[];
+export declare const ctas: readonly Cta[];
+export declare function getCtas(options?: { intent?: CtaIntent }): Cta[];
+
 export interface Tip {
   ar: string;
   en: string;
@@ -47,6 +60,9 @@ export declare function normalize(text: string): string;
 
 declare const _default: {
   hooks: typeof hooks;
+  ctas: typeof ctas;
+  CTA_INTENTS: typeof CTA_INTENTS;
+  getCtas: typeof getCtas;
   CATEGORIES: typeof CATEGORIES;
   CATEGORY_LABELS: typeof CATEGORY_LABELS;
   DIALECTS: typeof DIALECTS;

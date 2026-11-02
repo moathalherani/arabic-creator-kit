@@ -1,0 +1,45 @@
+{
+  "name": "arabic-dates",
+  "version": "0.1.0",
+  "description": "Arabic dates for apps and content calendars: month names by region (يناير / كانون الثاني / جانفي), Hijri Umm al-Qura conversion, Ramadan and Eid planning dates, and relative time with correct dual and plural (منذ دقيقتين). Zero dependencies.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "arabic",
+    "hijri",
+    "umm-al-qura",
+    "ramadan",
+    "eid",
+    "date",
+    "time-ago",
+    "relative-time",
+    "i18n",
+    "هجري",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-dates#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-dates"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

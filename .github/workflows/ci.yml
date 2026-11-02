@@ -21,6 +21,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm test
       - run: npm run check:skills
+      - run: node scripts/build-site.js
       - name: Pack check
         run: |
           for d in packages/*; do (cd "$d" && npm pack --dry-run); done
