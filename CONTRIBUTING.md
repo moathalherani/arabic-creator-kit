@@ -6,7 +6,7 @@ Thank you for helping Arabic creators and developers. Every contribution counts,
 
 ## Easiest first contribution: hooks in your dialect / أسهل مساهمة
 
-**No coding:** open the [ضيف هوكك page](https://moathalherani.github.io/arabic-creator-kit/contribute/), write your hook and pick your dialect. It opens GitHub with a small file ready in `contrib/hooks/`. Press **Commit changes…**, then **Propose changes**, then **Create pull request**. After it is merged, a workflow gives the hook its id and moves it into the dataset.
+**No coding:** open the [ضيف هوكك page](https://moathalherani.github.io/arabic-creator-kit/contribute/), write your hook and pick your dialect. It opens GitHub with a small file ready in `contrib/hooks/`. Press **Commit changes…**, then **Propose changes**, then **Create pull request**. After it is merged, a workflow gives the hook its id, moves it into the dataset and credits your GitHub username on the [contributors wall](https://moathalherani.github.io/arabic-creator-kit/contribute/).
 
 بلا برمجة: افتح [صفحة ضيف هوكك](https://moathalherani.github.io/arabic-creator-kit/contribute/)، اكتب الهوك واختار لهجتك، واكبس الزر. GitHub بيفتح والملف جاهز.
 

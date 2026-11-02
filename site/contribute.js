@@ -82,6 +82,22 @@ $("c-copy").addEventListener("click", async () => {
 });
 for (const id of ["c-ar", "c-en", "c-dialect", "c-category"]) $(id).addEventListener("input", render);
 
+/* wall: hooks added by the community, newest first, with a link to each contributor */
+const community = hooks.filter((h) => h.by).reverse();
+const people = new Set(community.map((h) => h.by));
+$("wall-lead").textContent = community.length
+  ? `${community.length} هوك من ${people.size} مساهم لهلأ. هوكك الجاي؟`
+  : "لسا فاضي. أول هوك بينضاف بيطلع هون باسم صاحبه، وبيضل.";
+for (const h of community.slice(0, 30)) {
+  const li = document.createElement("li");
+  const q = Object.assign(document.createElement("p"), { textContent: h.ar });
+  const meta = document.createElement("div");
+  const who = Object.assign(document.createElement("a"), { href: `https://github.com/${h.by}`, textContent: `@${h.by}`, target: "_blank", rel: "noopener", dir: "ltr" });
+  meta.append(Object.assign(document.createElement("span"), { className: "tag", textContent: DIALECT_AR[h.dialect] ?? h.dialect }), who, Object.assign(document.createElement("b"), { textContent: String(scoreHook(h.ar).score) }));
+  li.append(q, meta);
+  $("wall").append(li);
+}
+
 const params = new URLSearchParams(location.search);
 if (params.get("dialect") && DIALECT_AR[params.get("dialect")]) $("c-dialect").value = params.get("dialect");
 render();

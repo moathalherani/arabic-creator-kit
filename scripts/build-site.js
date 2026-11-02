@@ -296,6 +296,11 @@ const cHtml = `${head({
         <div class="share" id="c-share" aria-label="شارك الهوك"></div>
       </div>
     </section>
+    <section class="page-body wall-section" aria-labelledby="wall-title">
+      <h2 id="wall-title">جدار المساهمين</h2>
+      <p class="lead" id="wall-lead"></p>
+      <ul class="wall" id="wall"></ul>
+    </section>
     <section class="page-body">
       <h2>3 خطوات وبس</h2>
       <ol class="steps">

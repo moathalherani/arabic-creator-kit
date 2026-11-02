@@ -8,6 +8,7 @@
 // The Pages workflow runs the second form after a pull request is merged and commits the result.
 import { readdirSync, readFileSync, writeFileSync, unlinkSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -78,8 +79,25 @@ function nextId(category, dialect) {
   return id;
 }
 
-const blocks = accepted.map(({ entry }) => {
+/** GitHub login of whoever added the file, from the commit's noreply email (or nothing). */
+function author(file) {
+  try {
+    const [sha, email] = execFileSync("git", ["log", "--diff-filter=A", "--format=%H %ae", "-1", "--", join("contrib", "hooks", file)], { cwd: root, encoding: "utf8" }).trim().split(" ");
+    let login = email?.match(/^(?:\d+\+)?([A-Za-z0-9-]+)@users\.noreply\.github\.com$/)?.[1];
+    // In GitHub Actions, ask the API which account made the commit (works when the email is public too).
+    if (!login && sha && process.env.GITHUB_REPOSITORY && process.env.GH_TOKEN) {
+      login = execFileSync("gh", ["api", `repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}`, "-q", ".author.login // empty"], { encoding: "utf8" }).trim() || undefined;
+    }
+    return login && /^[A-Za-z0-9-]+$/.test(login) && !/\[bot\]|^github-actions$/.test(login) ? login : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const blocks = accepted.map(({ file, entry }) => {
   const h = { id: nextId(entry.category, entry.dialect), category: entry.category, dialect: entry.dialect, ar: entry.ar.trim(), en: (entry.en ?? "").trim() };
+  const by = author(file);
+  if (by) h.by = by;
   return JSON.stringify(h, null, 2).replace(/^/gm, "  ");
 });
 const src = readFileSync(dataFile, "utf8");

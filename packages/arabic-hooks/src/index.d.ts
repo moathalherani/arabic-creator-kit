@@ -8,6 +8,8 @@ export interface Hook {
   readonly ar: string;
   /** English translation. May be an empty string for community hooks added without one. */
   readonly en: string;
+  /** GitHub username of the community member who contributed this hook, if any. */
+  readonly by?: string;
 }
 
 export interface HookTemplate {

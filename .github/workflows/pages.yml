@@ -23,10 +23,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100 # so merge-hooks.js can credit the contributor who added each file
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Move merged community hooks from contrib/hooks into the dataset
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           node scripts/merge-hooks.js
           if [ -n "$(git status --porcelain packages/arabic-hooks contrib/hooks)" ]; then

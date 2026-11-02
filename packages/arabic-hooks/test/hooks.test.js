@@ -43,6 +43,7 @@ test("dataset is well formed", () => {
     assert.ok(h.ar.trim(), h.id);
     assert.equal(typeof h.en, "string", `${h.id} en must be a string (it may be empty for community hooks)`);
     assert.ok(Object.hasOwn(DIALECTS, h.dialect), `${h.id} unknown dialect ${h.dialect}`);
+    if (h.by !== undefined) assert.match(h.by, /^[A-Za-z0-9-]+$/, `${h.id} by must be a GitHub username`);
     assert.match(h.ar, /[؀-ۿ]/, `${h.id} ar text must be Arabic`);
     assert.ok(h.dialect, h.id);
   }
