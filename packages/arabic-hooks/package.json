@@ -16,7 +16,7 @@
     }
   },
   "bin": {
-    "arabic-hooks": "./src/cli.js"
+    "arabic-hooks": "src/cli.js"
   },
   "files": [
     "src",

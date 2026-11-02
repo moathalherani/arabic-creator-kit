@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "arabic-captions": "./src/cli.js"
+    "arabic-captions": "src/cli.js"
   },
   "files": [
     "src",

@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "arabic-tafqeet": "./src/cli.js"
+    "arabic-tafqeet": "src/cli.js"
   },
   "files": [
     "src",
