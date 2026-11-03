@@ -304,34 +304,70 @@ function drawCover(ctx, video, rect) {
   ctx.drawImage(video, (vw - sw) / 2, (vh - sh) / 2, sw, sh, rect.x, rect.y, rect.w, rect.h);
 }
 
+/** Keyword caption chunk (from arabic-captions keywordCaptions) popping in over the video. */
+function drawCaption(ctx, env, cap, tSec, rect) {
+  if (!cap) return;
+  const p = prog(tSec, cap.start / 1000, 0.12);
+  const size = Math.round(env.u * (env.H > env.W ? 6.2 : 5));
+  const s = 0.9 + 0.1 * ease.back(p);
+  const words = cap.words ?? cap.text.split(/\s+/);
+  ctx.save();
+  ctx.font = `800 ${size}px ${env.font}`;
+  const space = ctx.measureText(" ").width;
+  const widths = words.map((w) => ctx.measureText(w).width);
+  const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
+  const rtl = env.rtl(cap.text);
+  const cx = rect.x + rect.w / 2;
+  const cy = rect.y + rect.h * 0.8;
+  ctx.translate(cx, cy);
+  ctx.scale(s, s);
+  ctx.globalAlpha = Math.min(1, p * 2);
+  ctx.lineJoin = "round";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  let cursor = rtl ? total / 2 : -total / 2;
+  words.forEach((w, i) => {
+    const x = rtl ? cursor - widths[i] / 2 : cursor + widths[i] / 2;
+    ctx.direction = env.rtl(w) ? "rtl" : "ltr";
+    ctx.lineWidth = size * 0.16;
+    ctx.strokeStyle = "rgba(0,0,0,0.85)";
+    ctx.strokeText(w, x, 0);
+    ctx.fillStyle = i === cap.keyword ? env.accent : "#FFFFFF";
+    ctx.fillText(w, x, 0);
+    cursor += (rtl ? -1 : 1) * (widths[i] + space);
+  });
+  ctx.restore();
+}
+
 /**
- * One frame with the person's video: background, video in its layout, then the motion
- * (drawn into its own area, so templates resize to fit). tMotion < 0 or past the end hides it.
+ * One frame: background, the person's video in its layout (optional), every active scene
+ * drawn in the motion area (templates resize to fit), then the keyword caption.
+ * layers: [{ template, props, t }] with t = seconds into that scene.
  */
-export function composeFrame(canvas, off, template, props, settings, tMotion, video, layout, tAll) {
+export function composeFrame(canvas, off, layers, settings, video, layout, tAll, caption) {
   const env = makeEnv(canvas, settings);
   if (canvas.width !== env.W) canvas.width = env.W;
   if (canvas.height !== env.H) canvas.height = env.H;
   const ctx = canvas.getContext("2d");
-  const rects = layoutRects(layout, env.W, env.H);
+  const withVideo = video && layout !== "none" && video.videoWidth;
+  const rects = layoutRects(withVideo ? layout : "none", env.W, env.H);
+  const active = layers.filter((l) => l.t >= 0 && l.t <= l.template.duration);
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
-  if (layout === "full") {
+  if (withVideo && layout === "full") {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, env.W, env.H);
     drawCover(ctx, video, rects.video);
-    const showing = tMotion >= 0 && tMotion <= template.duration;
-    if (showing) {
-      // darken a little while the motion is on, so the words read over any footage
-      const k = Math.min(prog(tMotion, 0, 0.3), 1 - prog(tMotion, template.duration - 0.3, 0.3));
+    const k = Math.max(0, ...active.map((l) => Math.min(prog(l.t, 0, 0.3), 1 - prog(l.t, l.template.duration - 0.3, 0.3))));
+    if (k > 0) {
       ctx.fillStyle = `rgba(0,0,0,${0.35 * k})`;
       ctx.fillRect(0, 0, env.W, env.H);
     }
   } else {
     drawGrid(ctx, env, tAll);
     const v = rects.video;
-    if (v) {
+    if (withVideo && v) {
       ctx.save();
       if (rects.circle) {
         ctx.beginPath();
@@ -344,7 +380,6 @@ export function composeFrame(canvas, off, template, props, settings, tMotion, vi
       drawCover(ctx, video, v);
       ctx.restore();
       if (layout === "bottom") {
-        // soft edge between the motion and the video
         const vertical = env.H >= env.W;
         const g = vertical ? ctx.createLinearGradient(0, v.y, 0, v.y + v.h * 0.14) : ctx.createLinearGradient(v.x + v.w, 0, v.x + v.w * 0.86, 0);
         g.addColorStop(0, env.theme.bg);
@@ -353,7 +388,6 @@ export function composeFrame(canvas, off, template, props, settings, tMotion, vi
         if (vertical) ctx.fillRect(v.x, v.y, v.w, v.h * 0.14);
         else ctx.fillRect(v.x + v.w * 0.86, v.y, v.w * 0.14, v.h);
       } else {
-        // white rounded edge (frame) or ring (circle)
         ctx.save();
         ctx.strokeStyle = "#FFFFFF";
         ctx.lineWidth = env.u * 1.2;
@@ -368,8 +402,17 @@ export function composeFrame(canvas, off, template, props, settings, tMotion, vi
       }
     }
   }
-  if (tMotion >= 0 && tMotion <= template.duration) {
-    const m = rects.motion;
+  const m = rects.motion;
+  for (const layer of active) {
+    if (!withVideo) {
+      // no video: the scene owns the whole canvas
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      layer.template.draw(ctx, layer.t, layer.props, env);
+      ctx.restore();
+      continue;
+    }
     if (off.width !== m.w) off.width = m.w;
     if (off.height !== m.h) off.height = m.h;
     const octx = off.getContext("2d");
@@ -380,14 +423,14 @@ export function composeFrame(canvas, off, template, props, settings, tMotion, vi
     octx.textBaseline = "middle";
     const menv = makeEnv(off, settings, { w: m.w, h: m.h });
     if (layout === "full" && hexToRgb(settings.ink)) {
-      // over footage the words are white unless the person picked a light text color already
       const c = hexToRgb(settings.ink);
       if ((0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 < 0.5) menv.theme = { ...menv.theme, ink: "#FFFFFF", muted: "rgba(255,255,255,0.78)" };
     }
-    template.draw(octx, tMotion, props, menv);
+    layer.template.draw(octx, layer.t, layer.props, menv);
     octx.restore();
     ctx.drawImage(off, m.x, m.y);
   }
+  if (caption) drawCaption(ctx, env, caption, tAll, withVideo && rects.video ? rects.video : { x: 0, y: env.H * 0.5, w: env.W, h: env.H * 0.5 });
   ctx.restore();
 }
 

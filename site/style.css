@@ -378,3 +378,18 @@ img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16p
 .color { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; background: var(--field); font-size: 0.9rem; }
 .color input[type="color"] { width: 36px; height: 36px; padding: 0; border: 0; background: none; flex: none; }
 .color input:disabled { opacity: 0.35; }
+.scenes { display: flex; flex-wrap: wrap; gap: 8px; }
+.scene { font: inherit; display: inline-flex; gap: 8px; align-items: baseline; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--field); color: var(--ink); cursor: pointer; }
+.scene b { font-size: 0.92rem; }
+.scene span { color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.scene.on { border-color: var(--leaf); box-shadow: 0 0 0 2px var(--leaf) inset; }
+.scene-actions { margin-top: 10px; gap: 8px; }
+.scene-actions .btn { padding: 8px 14px; font-size: 0.88rem; }
+.scene-actions .btn:disabled { opacity: 0.4; }
+.timeline { position: relative; height: 40px; margin-top: 10px; border-radius: 10px; background: var(--leaf-soft); overflow: hidden; cursor: pointer; }
+.timeline .blk { position: absolute; top: 6px; height: 20px; border: 0; border-radius: 6px; background: var(--leaf); color: #fff; font: 600 0.75rem/20px var(--plex, inherit); text-align: center; cursor: pointer; opacity: 0.75; padding: 0; min-width: 14px; }
+.timeline .blk.on { opacity: 1; box-shadow: 0 0 0 2px var(--ink); }
+.timeline .caps { position: absolute; inset-inline: 0; bottom: 5px; height: 5px; border-radius: 3px; background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 10px); opacity: 0.35; }
+.timeline .head { position: absolute; top: 0; bottom: 0; width: 2px; background: #d33; pointer-events: none; }
+.pal-label { display: block; margin-top: 14px; }
+.note .chip { margin-inline-start: 6px; }

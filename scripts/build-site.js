@@ -331,7 +331,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
 /* motion studio: templates in site/motion/templates/*.js, index generated here */
 {
   const tdir = join(root, "site", "motion", "templates");
-  const first = ["hook", "number", "versus", "steps", "window", "follow"];
+  const first = ["hook", "title", "number", "price", "versus", "compare", "steps", "window", "quote", "follow"];
   const ids = readdirSync(tdir).filter((f) => f.endsWith(".js") && f !== "index.js").map((f) => f.slice(0, -3));
   ids.sort((a, b) => (first.includes(a) ? first.indexOf(a) : 99) - (first.includes(b) ? first.indexOf(b) : 99) || a.localeCompare(b));
   writeFileSync(
@@ -340,9 +340,9 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
   );
   const url = `${BASE}motion/`;
   urls.push(url);
-  const desc = "استوديو موشن جرافيك مجاني بالعربي: اختار قالب (هوك، رقم كبير، مشكلة وحل، خطوات، جوا برنامج، تابعني)، غيّر الخط العربي والإنجليزي والألوان، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
+  const desc = "استوديو موشن جرافيك مجاني بالعربي: رتّب مشاهد من 10 قوالب (هوك، عنوان، رقم، سعر، مشكلة وحل، مقارنة، خطوات، جوا برنامج، اقتباس، تابعني) على فيديوك مع الكابشن، غيّر الخط العربي والإنجليزي والألوان، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
   const faq = [
-    { question: "كيف بحطه على فيديوي؟", answer: "أسهل طريقة: ارفع فيديوك بالخطوة 6، وبيطلعلك فيديو واحد فيه إنت والموشن وصوتك. أو نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
+    { question: "كيف بحطه على فيديوي؟", answer: "أسهل طريقة: ارفع فيديوك بالخطوة 4، وبيطلعلك فيديو واحد فيه إنت والموشن وصوتك. أو نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
     { question: "مجاني؟ في علامة مائية؟", answer: "مجاني بالكامل وبدون علامة مائية. كل إشي بيصير بمتصفحك، وما بيترفع أي ملف لأي سيرفر." },
     { question: "شو الأصوات المقترحة؟", answer: "كل قالب بيقلك أي صوت تحط وبأي ثانية (Deep Drop، Impact، Ding…)، عشان الصوت يطلع مع الحركة بالضبط." },
     { question: "بقدر أضيف قالب؟", answer: "آه. كل قالب ملف JavaScript واحد بمجلد site/motion/templates على GitHub. اعمل قالبك وافتح Pull Request، واسمك بينضاف للمساهمين." },
@@ -359,25 +359,44 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
   <main>
     <section class="page-head">
       <h1>استوديو الموشن</h1>
-      <p class="lead">نفس ستايل الموشن جرافيك بفيديوهاتي، بكبسة: اختار قالب، اكتب كلامك، ونزّل الفيديو. حطه بـ CapCut فوق فيديوك وخلص.</p>
+      <p class="lead">نفس ستايل الموشن جرافيك بفيديوهاتي، بكبسة: رتّب مشاهدك، اكتب كلامك، ارفع فيديوك والكابشن، ونزّل فيديو واحد جاهز للنشر. مجاني وبدون علامة مائية.</p>
     </section>
     <section class="studio">
       <div class="studio-controls">
-        <h2 class="studio-h">1. القالب</h2>
+        <h2 class="studio-h">1. المشاهد</h2>
+        <div class="scenes" id="m-scenes"></div>
+        <div class="row scene-actions">
+          <button type="button" class="btn ghost" id="m-add-scene">+ مشهد</button>
+          <button type="button" class="btn ghost" id="m-del-scene">احذف المشهد</button>
+          <button type="button" class="btn ghost" id="m-play-scene">شغّل المشهد</button>
+        </div>
+        <h2 class="studio-h">2. قالب المشهد</h2>
         <div class="tpls" id="m-templates"></div>
-        <h2 class="studio-h">2. كلامك</h2>
+        <h2 class="studio-h">3. كلامك</h2>
         <div class="fields" id="m-fields"></div>
-        <h2 class="studio-h">3. المقاس والخلفية</h2>
+        <div class="fields" id="m-start-row" hidden>
+          <label class="field-label" for="m-start">المشهد يبدأ عند (ثانية)</label>
+          <input id="m-start" type="number" min="0" step="0.1" inputmode="decimal" dir="ltr">
+        </div>
+        <h2 class="studio-h">4. فيديوك والكابشن (اختياري)</h2>
+        <div class="fields">
+          <label class="field-label" for="m-video">ارفع فيديوك، والمشاهد بتطلع عليه بنفس الملف مع صوتك</label>
+          <input id="m-video" type="file" accept="video/*">
+          <p class="studio-status" id="m-video-info"></p>
+          <label class="field-label" for="m-layout">مكان فيديوك</label>
+          <select id="m-layout"></select>
+          <label class="field-label" for="m-srt">كابشن كلمات مفتاحية: ارفع ملف SRT أو VTT (من <a href="../autocaptions/">الكابشن الأوتوماتيك</a> أو CapCut)</label>
+          <input id="m-srt" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip">
+          <div class="row"><p class="studio-status" id="m-srt-info"></p><button type="button" class="chip" id="m-srt-clear" hidden>شيل الكابشن</button></div>
+        </div>
+        <h2 class="studio-h">5. الشكل</h2>
         <div class="fields two">
           <label class="stack"><span class="field-label">المقاس</span><select id="m-format"></select></label>
           <label class="stack"><span class="field-label">الخلفية</span><select id="m-bg"></select></label>
-        </div>
-        <h2 class="studio-h">4. الخطوط</h2>
-        <div class="fields two">
           <label class="stack"><span class="field-label">الخط العربي</span><select id="m-font-ar"></select></label>
           <label class="stack"><span class="field-label">الخط الإنجليزي والأرقام</span><select id="m-font-en"></select></label>
         </div>
-        <h2 class="studio-h">5. الألوان</h2>
+        <span class="field-label pal-label">الألوان</span>
         <div class="pals" id="m-palettes" role="group" aria-label="ألوان جاهزة"></div>
         <div class="fields colors">
           <label class="color"><input id="m-accent" type="color"><span>الكلمة المهمة والحل</span></label>
@@ -386,33 +405,27 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
           <label class="color"><input id="m-card" type="color"><span>الكروت</span></label>
           <label class="color"><input id="m-danger" type="color"><span>الغلط</span></label>
         </div>
-        <h2 class="studio-h">6. فيديوك (اختياري)</h2>
-        <div class="fields">
-          <label class="field-label" for="m-video">ارفع فيديوك، والموشن بيطلع عليه بنفس الملف</label>
-          <input id="m-video" type="file" accept="video/*">
-          <p class="studio-status" id="m-video-info"></p>
-        </div>
-        <div class="fields two">
-          <label class="stack"><span class="field-label">مكان فيديوك</span><select id="m-layout"></select></label>
-          <label class="stack"><span class="field-label">الموشن يبدأ عند (ثانية)</span><input id="m-start" type="number" min="0" step="0.1" inputmode="decimal" dir="ltr"></label>
-        </div>
+        <p class="note">الأداة بتتذكر خطوطك وألوانك على جهازك. <button type="button" class="chip" id="m-reset-style">رجّع الافتراضي</button></p>
       </div>
       <div class="studio-preview">
         <div class="canvas-wrap"><canvas id="m-canvas" width="1080" height="1920" aria-label="معاينة الموشن"></canvas></div>
+        <div class="timeline" id="m-timeline" aria-label="الخط الزمني"></div>
         <div class="row studio-bar">
           <button type="button" class="btn" id="m-export">نزّل الفيديو</button>
           <button type="button" class="btn ghost" id="m-replay">من الأول</button>
           <span class="studio-time" id="m-time" dir="ltr"></span>
         </div>
         <p class="studio-status" id="m-status" aria-live="polite"></p>
-        <div class="cues"><h3>الأصوات المقترحة</h3><ul id="m-cues"></ul></div>
+        <div class="cues"><h3>الأصوات المقترحة لهالمشهد</h3><ul id="m-cues"></ul></div>
       </div>
     </section>
     <section class="page-body">
       <h2>كيف تحطه على فيديوك</h2>
       <ol class="steps">
-        <li>بدك فيديو واحد جاهز؟ ارفع فيديوك بالخطوة 6 واختار مكانه (تحت، بإطار، بدائرة، أو كامل)، وبيطلع الملف فيه إنت والموشن وصوتك. بيتسجل بنفس طول فيديوك.</li>
-        <li>أو نزّل الموشن لحاله من الزر، بيتسجل بنفس سرعته الحقيقية، فاستنى ثواني.</li>
+        <li>رتّب مشاهدك: كل مشهد قالب (هوك، رقم، مشكلة وحل…). كبسة «+ مشهد» بتضيف مشهد جديد.</li>
+        <li>ارفع فيديوك واختار مكانه (تحت، بإطار، بدائرة، أو كامل)، وحدد كل مشهد بأي ثانية بيطلع، أو اكبس على الخط الزمني.</li>
+        <li>ضيف ملف SRT من أداة الكابشن الأوتوماتيك، وبيطلع الكابشن بالكلمة الملونة على فيديوك.</li>
+        <li>اكبس «نزّل الفيديو»: بيتسجل بنفس طول فيديوك، ومعه صوتك. بدون فيديو، بتنزل المشاهد ورا بعض كفيديو موشن لحاله.</li>
         <li>بـ CapCut: حط فيديوك، وفوقه الموشن كطبقة (Overlay).</li>
         <li>إذا اخترت الشاشة الخضرا: Remove BG ثم Chroma Key واختار الأخضر. إذا اخترت الـ Grid: خليه مشهد كامل بين لقطاتك.</li>
         <li>ضيف الأصوات بنفس الثواني المكتوبة تحت المعاينة.</li>

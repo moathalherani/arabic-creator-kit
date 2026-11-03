@@ -90,7 +90,7 @@ Most creator tools are built for English. Arabic adds right-to-left text mixed w
 
 ## Motion Studio / استوديو الموشن
 
-Free motion graphics for Reels in the browser: pick a template (hook, big number, problem vs solution, steps, inside an app window, follow me), type your words, download an MP4 and drop it over your video. Each template is one file in [`site/motion/templates/`](site/motion/templates/), so adding one is a small, fun first contribution. [Open the studio](https://moathalherani.github.io/arabic-creator-kit/motion/).
+A free motion-graphics editor for Reels in the browser: line up scenes from 10 templates (hook, title, big number, price, problem vs solution, compare, steps, inside an app window, quote, follow me), add your own video and SRT keyword captions, pick your Arabic and English fonts and colors, and download one finished MP4 with your sound. Each template is one file in [`site/motion/templates/`](site/motion/templates/), so adding one is a small, fun first contribution. [Open the studio](https://moathalherani.github.io/arabic-creator-kit/motion/).
 
 ## Arabic auto-captions / كابشن عربي أوتوماتيك
 

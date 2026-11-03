@@ -2,7 +2,7 @@
 
 **جرّبه:** https://moathalherani.github.io/arabic-creator-kit/motion/
 
-Pick a template, type your words, download an MP4 (or WebM) and drop it over your video in CapCut or Premiere. Everything runs in the browser on a `<canvas>`; nothing is uploaded.
+Line up scenes from 10 templates on a timeline, type your words, add your own video (bottom half, white frame, circle or full screen) and an SRT file for keyword captions, then download one finished MP4 with your sound. Without a video you get the scenes back to back as a motion clip to drop over your footage. Fonts and colors are yours (11 Arabic fonts, 8 English fonts, any colors, saved on your device). Everything runs in the browser on a `<canvas>`; nothing is uploaded.
 
 اختار قالب، اكتب كلامك، ونزّل الفيديو. كل إشي بيصير بمتصفحك.
 
