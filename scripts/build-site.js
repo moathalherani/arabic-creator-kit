@@ -342,7 +342,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
   urls.push(url);
   const desc = "استوديو موشن جرافيك مجاني بالعربي: اختار قالب (هوك، رقم كبير، مشكلة وحل، خطوات، جوا برنامج، تابعني)، غيّر الخط العربي والإنجليزي والألوان، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
   const faq = [
-    { question: "كيف بحطه على فيديوي؟", answer: "نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
+    { question: "كيف بحطه على فيديوي؟", answer: "أسهل طريقة: ارفع فيديوك بالخطوة 6، وبيطلعلك فيديو واحد فيه إنت والموشن وصوتك. أو نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
     { question: "مجاني؟ في علامة مائية؟", answer: "مجاني بالكامل وبدون علامة مائية. كل إشي بيصير بمتصفحك، وما بيترفع أي ملف لأي سيرفر." },
     { question: "شو الأصوات المقترحة؟", answer: "كل قالب بيقلك أي صوت تحط وبأي ثانية (Deep Drop، Impact، Ding…)، عشان الصوت يطلع مع الحركة بالضبط." },
     { question: "بقدر أضيف قالب؟", answer: "آه. كل قالب ملف JavaScript واحد بمجلد site/motion/templates على GitHub. اعمل قالبك وافتح Pull Request، واسمك بينضاف للمساهمين." },
@@ -386,6 +386,16 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
           <label class="color"><input id="m-card" type="color"><span>الكروت</span></label>
           <label class="color"><input id="m-danger" type="color"><span>الغلط</span></label>
         </div>
+        <h2 class="studio-h">6. فيديوك (اختياري)</h2>
+        <div class="fields">
+          <label class="field-label" for="m-video">ارفع فيديوك، والموشن بيطلع عليه بنفس الملف</label>
+          <input id="m-video" type="file" accept="video/*">
+          <p class="studio-status" id="m-video-info"></p>
+        </div>
+        <div class="fields two">
+          <label class="stack"><span class="field-label">مكان فيديوك</span><select id="m-layout"></select></label>
+          <label class="stack"><span class="field-label">الموشن يبدأ عند (ثانية)</span><input id="m-start" type="number" min="0" step="0.1" inputmode="decimal" dir="ltr"></label>
+        </div>
       </div>
       <div class="studio-preview">
         <div class="canvas-wrap"><canvas id="m-canvas" width="1080" height="1920" aria-label="معاينة الموشن"></canvas></div>
@@ -401,7 +411,8 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
     <section class="page-body">
       <h2>كيف تحطه على فيديوك</h2>
       <ol class="steps">
-        <li>نزّل الفيديو من الزر. بيتسجل بنفس سرعته الحقيقية، فاستنى ثواني.</li>
+        <li>بدك فيديو واحد جاهز؟ ارفع فيديوك بالخطوة 6 واختار مكانه (تحت، بإطار، بدائرة، أو كامل)، وبيطلع الملف فيه إنت والموشن وصوتك. بيتسجل بنفس طول فيديوك.</li>
+        <li>أو نزّل الموشن لحاله من الزر، بيتسجل بنفس سرعته الحقيقية، فاستنى ثواني.</li>
         <li>بـ CapCut: حط فيديوك، وفوقه الموشن كطبقة (Overlay).</li>
         <li>إذا اخترت الشاشة الخضرا: Remove BG ثم Chroma Key واختار الأخضر. إذا اخترت الـ Grid: خليه مشهد كامل بين لقطاتك.</li>
         <li>ضيف الأصوات بنفس الثواني المكتوبة تحت المعاينة.</li>

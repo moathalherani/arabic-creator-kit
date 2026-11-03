@@ -206,8 +206,8 @@ export function layoutWords(ctx, env, text, size, maxWidth, lineHeight = 1.25) {
   return out;
 }
 
-export function makeEnv(canvas, { format, background, accent, fontAr, fontEn, font, danger, ink, bg, card }) {
-  const f = FORMATS[format] ?? FORMATS.vertical;
+export function makeEnv(canvas, { format, background, accent, fontAr, fontEn, font, danger, ink, bg, card }, size) {
+  const f = size ?? FORMATS[format] ?? FORMATS.vertical;
   const preset = BACKGROUNDS[background] ?? BACKGROUNDS["grid-light"];
   const theme = { ...preset };
   if (ink) {
@@ -248,6 +248,146 @@ export function renderFrame(canvas, template, props, settings, t) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   template.draw(ctx, t, props, env);
+  ctx.restore();
+}
+
+/* ---------- your video + motion ---------- */
+export const LAYOUTS = {
+  none: { label: "بدون فيديو" },
+  bottom: { label: "فيديوك تحت والموشن فوق" },
+  frame: { label: "فيديوك بإطار أبيض" },
+  circle: { label: "فيديوك بدائرة" },
+  full: { label: "فيديوك كامل والموشن فوقه" },
+};
+
+/** Where the video and the motion go for a layout. */
+export function layoutRects(layout, W, H) {
+  const vertical = H >= W;
+  const r = (x, y, w, h) => ({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
+  if (layout === "full") return { video: r(0, 0, W, H), motion: r(0, 0, W, H) };
+  if (layout === "bottom") {
+    return vertical
+      ? { video: r(0, H * 0.5, W, H * 0.5), motion: r(0, 0, W, H * 0.5) }
+      : { video: r(0, 0, W * 0.5, H), motion: r(W * 0.5, 0, W * 0.5, H) };
+  }
+  if (layout === "frame") {
+    if (vertical) {
+      const fw = W * 0.78;
+      const fh = fw * 0.8;
+      const fy = H - fh - H * 0.07;
+      return { video: r((W - fw) / 2, fy, fw, fh), motion: r(0, 0, W, fy - H * 0.01), rounded: true };
+    }
+    const fh = H * 0.72;
+    const fw = fh * 0.8;
+    return { video: r(W * 0.06, (H - fh) / 2, fw, fh), motion: r(W * 0.06 + fw, 0, W - fw - W * 0.06, H), rounded: true };
+  }
+  if (layout === "circle") {
+    if (vertical) {
+      const d = W * 0.52;
+      const cy = H - d / 2 - H * 0.07;
+      return { video: r((W - d) / 2, cy - d / 2, d, d), motion: r(0, 0, W, cy - d / 2 - H * 0.01), circle: true };
+    }
+    const d = H * 0.6;
+    return { video: r(W * 0.08, (H - d) / 2, d, d), motion: r(W * 0.08 + d, 0, W - d - W * 0.08, H), circle: true };
+  }
+  return { video: null, motion: r(0, 0, W, H) };
+}
+
+/** Draw a video frame to fill rect (like object-fit: cover). */
+function drawCover(ctx, video, rect) {
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+  if (!vw || !vh) return;
+  const s = Math.max(rect.w / vw, rect.h / vh);
+  const sw = rect.w / s;
+  const sh = rect.h / s;
+  ctx.drawImage(video, (vw - sw) / 2, (vh - sh) / 2, sw, sh, rect.x, rect.y, rect.w, rect.h);
+}
+
+/**
+ * One frame with the person's video: background, video in its layout, then the motion
+ * (drawn into its own area, so templates resize to fit). tMotion < 0 or past the end hides it.
+ */
+export function composeFrame(canvas, off, template, props, settings, tMotion, video, layout, tAll) {
+  const env = makeEnv(canvas, settings);
+  if (canvas.width !== env.W) canvas.width = env.W;
+  if (canvas.height !== env.H) canvas.height = env.H;
+  const ctx = canvas.getContext("2d");
+  const rects = layoutRects(layout, env.W, env.H);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  if (layout === "full") {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, env.W, env.H);
+    drawCover(ctx, video, rects.video);
+    const showing = tMotion >= 0 && tMotion <= template.duration;
+    if (showing) {
+      // darken a little while the motion is on, so the words read over any footage
+      const k = Math.min(prog(tMotion, 0, 0.3), 1 - prog(tMotion, template.duration - 0.3, 0.3));
+      ctx.fillStyle = `rgba(0,0,0,${0.35 * k})`;
+      ctx.fillRect(0, 0, env.W, env.H);
+    }
+  } else {
+    drawGrid(ctx, env, tAll);
+    const v = rects.video;
+    if (v) {
+      ctx.save();
+      if (rects.circle) {
+        ctx.beginPath();
+        ctx.arc(v.x + v.w / 2, v.y + v.h / 2, v.w / 2, 0, Math.PI * 2);
+        ctx.clip();
+      } else if (rects.rounded) {
+        roundRect(ctx, v.x, v.y, v.w, v.h, env.u * 4);
+        ctx.clip();
+      }
+      drawCover(ctx, video, v);
+      ctx.restore();
+      if (layout === "bottom") {
+        // soft edge between the motion and the video
+        const vertical = env.H >= env.W;
+        const g = vertical ? ctx.createLinearGradient(0, v.y, 0, v.y + v.h * 0.14) : ctx.createLinearGradient(v.x + v.w, 0, v.x + v.w * 0.86, 0);
+        g.addColorStop(0, env.theme.bg);
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        if (vertical) ctx.fillRect(v.x, v.y, v.w, v.h * 0.14);
+        else ctx.fillRect(v.x + v.w * 0.86, v.y, v.w * 0.14, v.h);
+      } else {
+        // white rounded edge (frame) or ring (circle)
+        ctx.save();
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = env.u * 1.2;
+        ctx.shadowColor = "rgba(0,0,0,0.25)";
+        ctx.shadowBlur = env.u * 3;
+        if (rects.circle) {
+          ctx.beginPath();
+          ctx.arc(v.x + v.w / 2, v.y + v.h / 2, v.w / 2, 0, Math.PI * 2);
+        } else roundRect(ctx, v.x, v.y, v.w, v.h, env.u * 4);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+  if (tMotion >= 0 && tMotion <= template.duration) {
+    const m = rects.motion;
+    if (off.width !== m.w) off.width = m.w;
+    if (off.height !== m.h) off.height = m.h;
+    const octx = off.getContext("2d");
+    octx.setTransform(1, 0, 0, 1, 0, 0);
+    octx.clearRect(0, 0, m.w, m.h);
+    octx.save();
+    octx.textAlign = "center";
+    octx.textBaseline = "middle";
+    const menv = makeEnv(off, settings, { w: m.w, h: m.h });
+    if (layout === "full" && hexToRgb(settings.ink)) {
+      // over footage the words are white unless the person picked a light text color already
+      const c = hexToRgb(settings.ink);
+      if ((0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 < 0.5) menv.theme = { ...menv.theme, ink: "#FFFFFF", muted: "rgba(255,255,255,0.78)" };
+    }
+    template.draw(octx, tMotion, props, menv);
+    octx.restore();
+    ctx.drawImage(off, m.x, m.y);
+  }
   ctx.restore();
 }
 
