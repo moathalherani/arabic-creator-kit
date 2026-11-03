@@ -393,3 +393,5 @@ img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16p
 .timeline .head { position: absolute; top: 0; bottom: 0; width: 2px; background: #d33; pointer-events: none; }
 .pal-label { display: block; margin-top: 14px; }
 .note .chip { margin-inline-start: 6px; }
+.fields.fx .check { white-space: normal; color: var(--ink); align-items: flex-start; line-height: 1.5; }
+.fields.fx .check input { margin-top: 5px; accent-color: var(--leaf); }

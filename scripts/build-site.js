@@ -331,7 +331,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
 /* motion studio: templates in site/motion/templates/*.js, index generated here */
 {
   const tdir = join(root, "site", "motion", "templates");
-  const first = ["hook", "title", "number", "price", "versus", "compare", "steps", "window", "quote", "follow"];
+  const first = ["hook", "title", "number", "chat", "notification", "ranking", "price", "versus", "compare", "chart", "phone", "beforeafter", "steps", "window", "editor", "audio", "quote", "follow"];
   const ids = readdirSync(tdir).filter((f) => f.endsWith(".js") && f !== "index.js").map((f) => f.slice(0, -3));
   ids.sort((a, b) => (first.includes(a) ? first.indexOf(a) : 99) - (first.includes(b) ? first.indexOf(b) : 99) || a.localeCompare(b));
   writeFileSync(
@@ -340,7 +340,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
   );
   const url = `${BASE}motion/`;
   urls.push(url);
-  const desc = "استوديو موشن جرافيك مجاني بالعربي: رتّب مشاهد من 10 قوالب (هوك، عنوان، رقم، سعر، مشكلة وحل، مقارنة، خطوات، جوا برنامج، اقتباس، تابعني) على فيديوك مع الكابشن، غيّر الخط العربي والإنجليزي والألوان، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
+  const desc = "استوديو موشن جرافيك مجاني بالعربي: 18 قالب (هوك، رقم، سألت الذكاء الاصطناعي، إشعارات، أفضل 3، رسم بياني، شاشة تلفون، قبل وبعد، جوا المونتاج…) على فيديوك مع كابشن كلمة كلمة وزوم على الكلمة المهمة وشريط تقدّم. غيّر الخطوط والألوان ونزّل الفيديو جاهز.";
   const faq = [
     { question: "كيف بحطه على فيديوي؟", answer: "أسهل طريقة: ارفع فيديوك بالخطوة 4، وبيطلعلك فيديو واحد فيه إنت والموشن وصوتك. أو نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
     { question: "مجاني؟ في علامة مائية؟", answer: "مجاني بالكامل وبدون علامة مائية. كل إشي بيصير بمتصفحك، وما بيترفع أي ملف لأي سيرفر." },
@@ -388,6 +388,14 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
           <label class="field-label" for="m-srt">كابشن كلمات مفتاحية: ارفع ملف SRT أو VTT (من <a href="../autocaptions/">الكابشن الأوتوماتيك</a> أو CapCut)</label>
           <input id="m-srt" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip">
           <div class="row"><p class="studio-status" id="m-srt-info"></p><button type="button" class="chip" id="m-srt-clear" hidden>شيل الكابشن</button></div>
+          <label class="field-label" for="m-capstyle">شكل الكابشن</label>
+          <select id="m-capstyle"></select>
+        </div>
+        <h2 class="studio-h">حركات بتخلي الناس تكمل للآخر</h2>
+        <div class="fields fx">
+          <label class="check"><input type="checkbox" id="m-punch"> زوم سريع على فيديوك مع الكلمة المهمة (Punch-in)</label>
+          <label class="check"><input type="checkbox" id="m-progress"> شريط تقدّم فوق الفيديو</label>
+          <label class="check"><input type="checkbox" id="m-safe"> ورجيني وين أزرار إنستغرام وتيك توك (بالمعاينة بس)</label>
         </div>
         <h2 class="studio-h">5. الشكل</h2>
         <div class="fields two">

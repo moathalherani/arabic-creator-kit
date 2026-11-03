@@ -293,32 +293,53 @@ export function layoutRects(layout, W, H) {
   return { video: null, motion: r(0, 0, W, H) };
 }
 
-/** Draw a video frame to fill rect (like object-fit: cover). */
-function drawCover(ctx, video, rect) {
+/** Draw a video frame to fill rect (like object-fit: cover). zoom > 1 punches in, a bit above center (faces). */
+function drawCover(ctx, video, rect, zoom = 1) {
   const vw = video.videoWidth;
   const vh = video.videoHeight;
   if (!vw || !vh) return;
-  const s = Math.max(rect.w / vw, rect.h / vh);
+  const s = Math.max(rect.w / vw, rect.h / vh) * zoom;
   const sw = rect.w / s;
   const sh = rect.h / s;
-  ctx.drawImage(video, (vw - sw) / 2, (vh - sh) / 2, sw, sh, rect.x, rect.y, rect.w, rect.h);
+  ctx.drawImage(video, (vw - sw) / 2, (vh - sh) * (zoom > 1 ? 0.42 : 0.5), sw, sh, rect.x, rect.y, rect.w, rect.h);
 }
 
+/** Punch-in zoom: a hard cut in on numbers and English words, and on every other caption chunk. */
+export function punchZoom(cap, tSec) {
+  if (!cap || !(cap.keyword >= 0)) return 1;
+  const strong = /[0-9A-Za-z]/.test(cap.words?.[cap.keyword] ?? "");
+  if (!strong && (cap.i ?? 0) % 2) return 1;
+  return 1 + (strong ? 0.16 : 0.09) * ease.out(prog(tSec, cap.start / 1000, 0.16));
+}
+
+/** Caption looks people pick in the studio. */
+export const CAPTION_STYLES = {
+  keyword: { label: "الكلمة المهمة بلون" },
+  box: { label: "الكلمة المهمة بمربع ملوّن" },
+  karaoke: { label: "كلمة كلمة مع الصوت" },
+};
+
 /** Keyword caption chunk (from arabic-captions keywordCaptions) popping in over the video. */
-function drawCaption(ctx, env, cap, tSec, rect) {
+function drawCaption(ctx, env, cap, tSec, rect, style = "keyword") {
   if (!cap) return;
   const p = prog(tSec, cap.start / 1000, 0.12);
   const size = Math.round(env.u * (env.H > env.W ? 6.2 : 5));
   const s = 0.9 + 0.1 * ease.back(p);
   const words = cap.words ?? cap.text.split(/\s+/);
+  const span = Math.max(0.001, (cap.end - cap.start) / 1000);
+  // karaoke: word i shows up at its share of the chunk's time
+  const shownAt = (i) => cap.start / 1000 + (span * 0.85 * i) / words.length;
   ctx.save();
   ctx.font = `800 ${size}px ${env.font}`;
-  const space = ctx.measureText(" ").width;
+  // the box style needs room so the colored box doesn't touch its neighbours
+  const space = Math.max(ctx.measureText(" ").width, style === "box" ? size * 0.5 : 0);
   const widths = words.map((w) => ctx.measureText(w).width);
   const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
   const rtl = env.rtl(cap.text);
   const cx = rect.x + rect.w / 2;
-  const cy = rect.y + rect.h * 0.8;
+  // full-height vertical video: stay above the app's caption + buttons area
+  const tall = env.H > env.W && rect.h > env.H * 0.9;
+  const cy = rect.y + rect.h * (tall ? 0.73 : 0.8);
   ctx.translate(cx, cy);
   ctx.scale(s, s);
   ctx.globalAlpha = Math.min(1, p * 2);
@@ -328,14 +349,91 @@ function drawCaption(ctx, env, cap, tSec, rect) {
   let cursor = rtl ? total / 2 : -total / 2;
   words.forEach((w, i) => {
     const x = rtl ? cursor - widths[i] / 2 : cursor + widths[i] / 2;
+    cursor += (rtl ? -1 : 1) * (widths[i] + space);
+    let color = i === cap.keyword ? env.accent : "#FFFFFF";
+    ctx.save();
+    if (style === "karaoke") {
+      const wp = prog(tSec, shownAt(i), 0.1);
+      if (wp <= 0) {
+        ctx.restore();
+        return;
+      }
+      const current = tSec < (i + 1 < words.length ? shownAt(i + 1) : Infinity);
+      color = current ? env.accent : "#FFFFFF";
+      const k = 0.85 + 0.15 * ease.back(wp);
+      ctx.translate(x, 0);
+      ctx.scale(k, k);
+      ctx.translate(-x, 0);
+    }
     ctx.direction = env.rtl(w) ? "rtl" : "ltr";
+    if (style === "box" && i === cap.keyword) {
+      const pad = size * 0.22;
+      ctx.translate(x, 0);
+      ctx.rotate(-0.035);
+      ctx.translate(-x, 0);
+      roundRect(ctx, x - widths[i] / 2 - pad, -size * 0.62, widths[i] + pad * 2, size * 1.24, size * 0.22);
+      ctx.fillStyle = env.accent;
+      ctx.fill();
+      ctx.fillStyle = env.onAccent;
+      ctx.fillText(w, x, 0);
+      ctx.restore();
+      return;
+    }
     ctx.lineWidth = size * 0.16;
     ctx.strokeStyle = "rgba(0,0,0,0.85)";
     ctx.strokeText(w, x, 0);
-    ctx.fillStyle = i === cap.keyword ? env.accent : "#FFFFFF";
+    ctx.fillStyle = color;
     ctx.fillText(w, x, 0);
-    cursor += (rtl ? -1 : 1) * (widths[i] + space);
+    ctx.restore();
   });
+  ctx.restore();
+}
+
+/** Thin progress bar across the top; fills from the right (Arabic reading direction). */
+function drawProgress(ctx, env, p) {
+  const h = Math.max(4, env.u * 0.8);
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillRect(0, 0, env.W, h);
+  ctx.fillStyle = env.accent;
+  const w = env.W * clamp01(p);
+  ctx.fillRect(env.W - w, 0, w, h);
+  ctx.restore();
+}
+
+/**
+ * Preview only (never exported): where Reels / TikTok / Shorts put their own buttons and text
+ * on a 9:16 video, so nothing important goes under them.
+ */
+export function drawSafeZones(ctx, env) {
+  if (env.H <= env.W) return;
+  const { W, H, u } = env;
+  const zones = [
+    { x: 0, y: 0, w: W, h: H * 0.11, label: "اسم الحساب والبحث" },
+    { x: 0, y: H * 0.78, w: W, h: H * 0.22, label: "الكابشن والصوت" },
+    { x: W * 0.86, y: H * 0.42, w: W * 0.14, h: H * 0.36, label: "" },
+  ];
+  ctx.save();
+  for (const z of zones) {
+    ctx.fillStyle = "rgba(255,60,60,0.16)";
+    ctx.fillRect(z.x, z.y, z.w, z.h);
+    ctx.strokeStyle = "rgba(255,60,60,0.75)";
+    ctx.setLineDash([u * 1.6, u * 1.2]);
+    ctx.lineWidth = Math.max(2, u * 0.3);
+    ctx.strokeRect(z.x + 1, z.y + 1, z.w - 2, z.h - 2);
+    if (z.label) {
+      ctx.font = `700 ${u * 3.2}px ${env.font}`;
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.strokeStyle = "rgba(0,0,0,0.6)";
+      ctx.setLineDash([]);
+      ctx.lineWidth = u * 0.5;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.direction = "rtl";
+      ctx.strokeText(z.label, z.x + z.w / 2, z.y + z.h / 2);
+      ctx.fillText(z.label, z.x + z.w / 2, z.y + z.h / 2);
+    }
+  }
   ctx.restore();
 }
 
@@ -343,8 +441,9 @@ function drawCaption(ctx, env, cap, tSec, rect) {
  * One frame: background, the person's video in its layout (optional), every active scene
  * drawn in the motion area (templates resize to fit), then the keyword caption.
  * layers: [{ template, props, t }] with t = seconds into that scene.
+ * fx: { punch: zoom in on keywords, progress: 0..1 for the top bar (or null), captionStyle }.
  */
-export function composeFrame(canvas, off, layers, settings, video, layout, tAll, caption) {
+export function composeFrame(canvas, off, layers, settings, video, layout, tAll, caption, fx = {}) {
   const env = makeEnv(canvas, settings);
   if (canvas.width !== env.W) canvas.width = env.W;
   if (canvas.height !== env.H) canvas.height = env.H;
@@ -352,13 +451,14 @@ export function composeFrame(canvas, off, layers, settings, video, layout, tAll,
   const withVideo = video && layout !== "none" && video.videoWidth;
   const rects = layoutRects(withVideo ? layout : "none", env.W, env.H);
   const active = layers.filter((l) => l.t >= 0 && l.t <= l.template.duration);
+  const zoom = fx.punch ? punchZoom(caption, tAll) : 1;
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
   if (withVideo && layout === "full") {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, env.W, env.H);
-    drawCover(ctx, video, rects.video);
+    drawCover(ctx, video, rects.video, zoom);
     const k = Math.max(0, ...active.map((l) => Math.min(prog(l.t, 0, 0.3), 1 - prog(l.t, l.template.duration - 0.3, 0.3))));
     if (k > 0) {
       ctx.fillStyle = `rgba(0,0,0,${0.35 * k})`;
@@ -377,7 +477,7 @@ export function composeFrame(canvas, off, layers, settings, video, layout, tAll,
         roundRect(ctx, v.x, v.y, v.w, v.h, env.u * 4);
         ctx.clip();
       }
-      drawCover(ctx, video, v);
+      drawCover(ctx, video, v, zoom);
       ctx.restore();
       if (layout === "bottom") {
         const vertical = env.H >= env.W;
@@ -430,7 +530,8 @@ export function composeFrame(canvas, off, layers, settings, video, layout, tAll,
     octx.restore();
     ctx.drawImage(off, m.x, m.y);
   }
-  if (caption) drawCaption(ctx, env, caption, tAll, withVideo && rects.video ? rects.video : { x: 0, y: env.H * 0.5, w: env.W, h: env.H * 0.5 });
+  if (caption) drawCaption(ctx, env, caption, tAll, withVideo && rects.video ? rects.video : { x: 0, y: env.H * 0.5, w: env.W, h: env.H * 0.5 }, fx.captionStyle);
+  if (typeof fx.progress === "number") drawProgress(ctx, env, fx.progress);
   ctx.restore();
 }
 

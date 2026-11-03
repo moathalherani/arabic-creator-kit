@@ -1,5 +1,5 @@
 // Motion Studio page: scenes on a timeline, your video, keyword captions, export.
-import { FORMATS, BACKGROUNDS, AR_FONTS, EN_FONTS, PALETTES, LAYOUTS, composeFrame } from "./engine.js";
+import { FORMATS, BACKGROUNDS, AR_FONTS, EN_FONTS, PALETTES, LAYOUTS, CAPTION_STYLES, composeFrame, drawSafeZones, makeEnv } from "./engine.js";
 import templates from "./templates/index.js";
 import { parseSubtitles, keywordCaptions } from "../lib/arabic-captions/index.js";
 
@@ -10,7 +10,8 @@ const STYLE_KEY = "motion-studio-style-v1";
 
 const defaults = () => {
   const { name, ...colors } = PALETTES[0];
-  return { format: "vertical", background: "grid-light", fontAr: "Kufam", fontEn: "", ...colors };
+  // fx flags are strings ("1" or "") so they save and share like the rest of the look
+  return { format: "vertical", background: "grid-light", fontAr: "Kufam", fontEn: "", ...colors, capStyle: "keyword", punch: "1", progress: "1", safe: "" };
 };
 function loadStyle() {
   try {
@@ -91,7 +92,8 @@ function layersAt(t) {
 function captionAt(t) {
   if (!state.captions) return null;
   const ms = t * 1000;
-  return state.captions.find((c) => ms >= c.start && ms < c.end) ?? null;
+  const i = state.captions.findIndex((c) => ms >= c.start && ms < c.end);
+  return i < 0 ? null : { ...state.captions[i], i };
 }
 
 /* ---------- controls: look ---------- */
@@ -101,6 +103,19 @@ for (const [k, b] of Object.entries(BACKGROUNDS)) $("m-bg").append(opt(k, b.labe
 for (const f of Object.keys(AR_FONTS)) $("m-font-ar").append(opt(f, f));
 for (const f of Object.keys(EN_FONTS)) $("m-font-en").append(opt(f, f || "نفس الخط العربي"));
 for (const [k, l] of Object.entries(LAYOUTS)) $("m-layout").append(opt(k, l.label));
+for (const [k, c] of Object.entries(CAPTION_STYLES)) $("m-capstyle").append(opt(k, c.label));
+
+const FX_CHECKS = { "m-punch": "punch", "m-progress": "progress", "m-safe": "safe" };
+for (const [id, key] of Object.entries(FX_CHECKS)) {
+  $(id).addEventListener("change", () => {
+    state.settings[key] = $(id).checked ? "1" : "";
+    saveStyle();
+  });
+}
+$("m-capstyle").addEventListener("input", () => {
+  state.settings.capStyle = $("m-capstyle").value;
+  saveStyle();
+});
 
 const COLOR_INPUTS = { "m-accent": "accent", "m-ink": "ink", "m-bgcolor": "bg", "m-card": "card", "m-danger": "danger" };
 function syncLook() {
@@ -111,6 +126,8 @@ function syncLook() {
   $("m-font-en").value = st.fontEn;
   for (const [id, key] of Object.entries(COLOR_INPUTS)) $(id).value = st[key];
   $("m-bgcolor").disabled = st.background === "green";
+  for (const [id, key] of Object.entries(FX_CHECKS)) $(id).checked = st[key] === "1";
+  $("m-capstyle").value = CAPTION_STYLES[st.capStyle] ? st.capStyle : "keyword";
   markPalette();
 }
 for (const [id, key] of [["m-format", "format"], ["m-font-ar", "fontAr"], ["m-font-en", "fontEn"], ...Object.entries(COLOR_INPUTS)]) {
@@ -403,7 +420,10 @@ function tick(now) {
       t = 0;
     }
   }
-  composeFrame(canvas, off, layersAt(t), state.settings, hasVideo() ? video : null, state.layout, t, captionAt(t));
+  const st = state.settings;
+  const fx = { punch: st.punch === "1", captionStyle: st.capStyle, progress: st.progress === "1" && total > 0 ? Math.min(1, t / total) : null };
+  composeFrame(canvas, off, layersAt(t), st, hasVideo() ? video : null, state.layout, t, captionAt(t), fx);
+  if (st.safe === "1" && !state.recording) drawSafeZones(canvas.getContext("2d"), makeEnv(canvas, st));
   $("m-time").textContent = `${t.toFixed(1)} / ${total.toFixed(1)}s`;
   const head = $("m-head");
   if (head) head.style.insetInlineStart = `${(Math.min(t, total) / (total || 1)) * 100}%`;
