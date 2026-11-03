@@ -8,6 +8,7 @@ import { join } from "node:path";
 
 const dry = process.argv.includes("--dry-run");
 const root = new URL("../packages/", import.meta.url).pathname;
+const failed = [];
 
 for (const dir of readdirSync(root)) {
   const pkgDir = join(root, dir);
@@ -26,6 +27,13 @@ for (const dir of readdirSync(root)) {
   }
   console.log(`${dry ? "would stage" : "staging"} ${name}@${version}`);
   if (!dry) {
-    execFileSync("npm", ["stage", "publish", "--access", "public", "--provenance"], { cwd: pkgDir, stdio: "inherit" });
+    try {
+      execFileSync("npm", ["stage", "publish", "--access", "public", "--provenance"], { cwd: pkgDir, stdio: "inherit" });
+    } catch {
+      // e.g. this version is already staged and waiting for approval: keep going with the others
+      console.log(`could not stage ${name}@${version} (already staged?)`);
+      failed.push(`${name}@${version}`);
+    }
   }
 }
+if (failed.length) console.log(`Not staged this run: ${failed.join(", ")}`);

@@ -318,6 +318,17 @@ writeFileSync(join(zipDir, "index.html"), skillsHtml);
         </ol>
         <div class="row ai-actions"><a class="btn" href="chatgpt-instructions.txt" download>التعليمات</a><a class="btn ghost" href="make_link.py" download>make_link.py</a></div>
       </article>
+      <article class="ai-way">
+        <span class="tag">Claude Desktop وClaude Code</span>
+        <h2>كل الأدوات جوا Claude (MCP)</h2>
+        <p>Claude بيصمم الريل وبيعطيك الرابط، وبيقيّم الهوك، وبيلاقيلك هوكس بلهجتك، وبيعمل كابشن من SRT.</p>
+        <ol>
+          <li>بـ Claude Desktop افتح Settings ثم Developer ثم Edit Config.</li>
+          <li>ضيف هالسطر جوا mcpServers واعمل Restart.</li>
+        </ol>
+        <pre class="code" dir="ltr">"arabic-creator-kit": { "command": "npx", "args": ["-y", "arabic-creator-mcp"] }</pre>
+        <p class="note">بـ Claude Code: <code dir="ltr">claude mcp add arabic-creator-kit -- npx -y arabic-creator-mcp</code></p>
+      </article>
     </section>
     <section class="page-body">
       <h2>وكمان</h2>

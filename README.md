@@ -29,6 +29,7 @@
 | 💰 [`arabic-tafqeet`](packages/arabic-tafqeet) | Amounts in Arabic words for invoices and cheques (AED, SAR, JOD, EGP…) | `npx arabic-tafqeet 1500 --only` |
 | 📅 [`arabic-dates`](packages/arabic-dates) | Month names by region, Hijri (Umm al-Qura), Ramadan and Eid planning dates, «منذ دقيقتين» | `npm i arabic-dates` |
 | 🔎 [`arabic-seo`](packages/arabic-seo) | Arabic slugs, hreflang, safe JSON-LD, digit and tashkeel fixes | `npm i arabic-seo` |
+| 🤖 [`arabic-creator-mcp`](packages/arabic-creator-mcp) | MCP server for Claude Desktop and Claude Code: design a reel and get a Motion Studio link, score and find hooks, captions, amounts in words | `npx -y arabic-creator-mcp` |
 | 🧠 [`skills/`](skills) | 14 Claude Skills for Arabic content | [download](https://moathalherani.github.io/arabic-creator-kit/#skills) |
 
 Every package: zero dependencies, Node 18+, works in the browser, ES modules with TypeScript types.

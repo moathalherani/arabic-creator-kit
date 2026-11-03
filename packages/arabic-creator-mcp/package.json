@@ -1,0 +1,48 @@
+{
+  "name": "arabic-creator-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Claude Desktop, Claude Code and other MCP clients: design Arabic reels that open ready in Motion Studio, score hooks, find hooks by dialect, keyword captions from SRT, amounts in Arabic words, post checks.",
+  "type": "module",
+  "main": "./src/tools.js",
+  "exports": {
+    ".": "./src/tools.js"
+  },
+  "bin": {
+    "arabic-creator-mcp": "src/server.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "arabic-captions": "^0.1.0",
+    "arabic-hooks": "^0.1.0",
+    "arabic-social": "^0.1.0",
+    "arabic-tafqeet": "^0.1.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "arabic",
+    "reels",
+    "motion-graphics",
+    "hooks",
+    "captions",
+    "content-creator",
+    "عربي"
+  ],
+  "license": "MIT",
+  "author": "Eng. Moath Alherani <collab@moathalherani.com> (https://moathalherani.com)",
+  "homepage": "https://github.com/moathalherani/arabic-creator-kit/tree/main/packages/arabic-creator-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moathalherani/arabic-creator-kit.git",
+    "directory": "packages/arabic-creator-mcp"
+  },
+  "bugs": "https://github.com/moathalherani/arabic-creator-kit/issues"
+}

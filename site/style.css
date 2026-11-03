@@ -412,3 +412,5 @@ img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16p
 .ai-way ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; color: var(--muted); }
 .ai-way .tag { justify-self: start; background: var(--leaf-soft); color: var(--leaf); border-radius: 999px; padding: 3px 10px; font-size: 0.8rem; font-weight: 600; }
 .ai-way .btn { justify-self: start; }
+.ai-way pre.code { margin: 0; padding: 12px; border-radius: 12px; background: var(--ink); color: var(--paper); font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; text-align: left; }
+.ai-way .note code { word-break: break-all; }

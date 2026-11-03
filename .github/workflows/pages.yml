@@ -40,6 +40,7 @@ jobs:
             git commit -m "Add community hooks from contrib/hooks"
             git push
           fi
+      - run: npm ci --no-audit --no-fund
       - run: npm test
       - run: node scripts/build-site.js
       - uses: actions/configure-pages@v5
