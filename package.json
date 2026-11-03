@@ -20,6 +20,7 @@
     "check:skills": "node scripts/check-skills.js",
     "check:hooks": "node scripts/merge-hooks.js --check",
     "check:prompts": "node scripts/check-prompts.js",
-    "check": "npm test && npm run check:skills && npm run check:hooks && npm run check:prompts"
+    "check:motion": "node scripts/check-motion.js",
+    "check": "npm test && npm run check:skills && npm run check:hooks && npm run check:prompts && npm run check:motion"
   }
 }

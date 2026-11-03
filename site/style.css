@@ -343,3 +343,29 @@ img.contributors { max-width: 100%; height: auto; margin-top: 8px; }
 .crumbs { color: var(--muted); font-size: 0.9rem; margin: 0 0 8px; }
 .crumbs a { color: var(--leaf); }
 img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16px; display: block; margin-bottom: 24px; }
+
+/* motion studio */
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: clamp(20px, 3vw, 40px); padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 48px); border-bottom: 1px solid var(--line); align-items: start; }
+.studio-h { font-size: 1rem; margin: 18px 0 10px; color: var(--muted); }
+.studio-h:first-child { margin-top: 0; }
+.tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.tpl { text-align: start; font: inherit; background: var(--field); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; color: var(--ink); display: grid; gap: 4px; }
+.tpl b { font-size: 1rem; }
+.tpl span { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+.tpl.on { border-color: var(--leaf); box-shadow: 0 0 0 2px var(--leaf) inset; }
+.fields { display: grid; gap: 8px; }
+.fields.two { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.fields input[type="color"] { height: 44px; padding: 4px; }
+.fields input[type="file"] { padding: 8px; }
+.studio-preview { position: sticky; top: 16px; }
+.canvas-wrap { background: repeating-conic-gradient(var(--line) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); display: grid; place-items: center; }
+.canvas-wrap canvas { width: 100%; height: auto; max-height: 70vh; object-fit: contain; display: block; }
+.studio-bar { margin-top: 12px; }
+.studio-time { margin-inline-start: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.studio-status { min-height: 1.4em; color: var(--muted); margin: 8px 0 0; font-size: 0.92rem; }
+.cues h3 { font-size: 0.95rem; margin: 14px 0 6px; }
+.cues ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 0.92rem; }
+.cues li { display: flex; gap: 8px; align-items: baseline; }
+.cues li b { color: var(--leaf); font-variant-numeric: tabular-nums; min-width: 3.4em; }
+.cues li em { color: var(--muted); font-style: normal; font-size: 0.85rem; }
+@media (max-width: 860px) { .studio { grid-template-columns: 1fr; } .studio-preview { position: static; order: -1; } .canvas-wrap canvas { max-height: 60vh; } }

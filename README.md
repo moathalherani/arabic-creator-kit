@@ -15,7 +15,7 @@
 
 **[جرّب الأدوات بمتصفحك ← Try it in your browser](https://moathalherani.github.io/arabic-creator-kit/)**
 
-[تقييم الهوك](https://moathalherani.github.io/arabic-creator-kit/hook/) · [المبلغ بالحروف](https://moathalherani.github.io/arabic-creator-kit/tafqeet/) · [كابشن الريلز](https://moathalherani.github.io/arabic-creator-kit/captions/) · [هاشتاقات](https://moathalherani.github.io/arabic-creator-kit/hashtags/) · [ميلادي ↔ هجري](https://moathalherani.github.io/arabic-creator-kit/hijri/) · [رابط عربي](https://moathalherani.github.io/arabic-creator-kit/slug/) · [Claude Skills](https://moathalherani.github.io/arabic-creator-kit/skills/) · [**كابشن أوتوماتيك**](https://moathalherani.github.io/arabic-creator-kit/autocaptions/) · [**برومبتات عربية**](https://moathalherani.github.io/arabic-creator-kit/prompts/) · [**ضيف هوكك**](https://moathalherani.github.io/arabic-creator-kit/contribute/)
+[تقييم الهوك](https://moathalherani.github.io/arabic-creator-kit/hook/) · [المبلغ بالحروف](https://moathalherani.github.io/arabic-creator-kit/tafqeet/) · [كابشن الريلز](https://moathalherani.github.io/arabic-creator-kit/captions/) · [هاشتاقات](https://moathalherani.github.io/arabic-creator-kit/hashtags/) · [ميلادي ↔ هجري](https://moathalherani.github.io/arabic-creator-kit/hijri/) · [رابط عربي](https://moathalherani.github.io/arabic-creator-kit/slug/) · [Claude Skills](https://moathalherani.github.io/arabic-creator-kit/skills/) · [**استوديو الموشن**](https://moathalherani.github.io/arabic-creator-kit/motion/) · [**كابشن أوتوماتيك**](https://moathalherani.github.io/arabic-creator-kit/autocaptions/) · [**برومبتات عربية**](https://moathalherani.github.io/arabic-creator-kit/prompts/) · [**ضيف هوكك**](https://moathalherani.github.io/arabic-creator-kit/contribute/)
 
 </div>
 
@@ -87,6 +87,10 @@ Then ask in any dialect: «اكتبلي 5 هوكس لفيديو عن السيا�
 ## Why
 
 Most creator tools are built for English. Arabic adds right-to-left text mixed with English brand names, Arabic-Indic digits, tashkeel, many dialects, regional month names, a second calendar, and grammar rules for numbers that generic tools get wrong. This kit packages the fixes we use every day on [moathalherani.com](https://moathalherani.com) and in our Reels, so nobody has to rebuild them.
+
+## Motion Studio / استوديو الموشن
+
+Free motion graphics for Reels in the browser: pick a template (hook, big number, problem vs solution, steps, inside an app window, follow me), type your words, download an MP4 and drop it over your video. Each template is one file in [`site/motion/templates/`](site/motion/templates/), so adding one is a small, fun first contribution. [Open the studio](https://moathalherani.github.io/arabic-creator-kit/motion/).
 
 ## Arabic auto-captions / كابشن عربي أوتوماتيك
 
