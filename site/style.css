@@ -336,3 +336,9 @@ img.contributors { max-width: 100%; height: auto; margin-top: 8px; }
 .add-form > .field-label { margin-bottom: -4px; }
 .note { color: var(--muted); font-size: 0.9rem; }
 @media (max-width: 420px) { .prompts { grid-template-columns: 1fr; } }
+.prompt-head h2 a { color: inherit; text-decoration: none; }
+.prompt-head h2 a:hover { color: var(--leaf); }
+.prompts.single { display: block; max-width: 900px; }
+.prompts.single pre { max-height: none; font-size: 1rem; }
+.crumbs { color: var(--muted); font-size: 0.9rem; margin: 0 0 8px; }
+.crumbs a { color: var(--leaf); }

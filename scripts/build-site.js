@@ -341,7 +341,7 @@ const pFaq = [
   { question: "مسموح أستخدمهم بشغلي؟", answer: "آه. المشروع مفتوح المصدر بترخيص MIT، استخدمهم وعدّل عليهم براحتك." },
 ];
 const card = (x) => `<article class="prompt" data-cat="${x.category}" id="${x.slug}">
-        <div class="prompt-head"><span class="tag">${esc(PROMPT_CATEGORIES[x.category])}</span><h2>${esc(x.title)}</h2><p>${esc(x.for)}</p></div>
+        <div class="prompt-head"><span class="tag">${esc(PROMPT_CATEGORIES[x.category])}</span><h2><a href="${x.slug}/">${esc(x.title)}</a></h2><p>${esc(x.for)}</p></div>
         <pre>${esc(x.body)}</pre>
         <div class="row"><button type="button" class="btn copy">انسخ</button><a class="btn ghost" target="_blank" rel="noopener" href="https://claude.ai/new?q=${encodeURIComponent(x.body)}">جرّبه بـ Claude</a><a class="chip" href="${REPO}/blob/main/prompts/${x.slug}.md">عدّل على GitHub</a></div>
       </article>`;
@@ -397,6 +397,61 @@ const pHtml = `${head({
 `;
 mkdirSync(join(out, "prompts"), { recursive: true });
 writeFileSync(join(out, "prompts", "index.html"), pHtml);
+
+/* one page per prompt, so each can be found on search engines */
+for (const x of prompts) {
+  const url = `${BASE}prompts/${x.slug}/`;
+  urls.push(url);
+  const desc = `برومبت عربي جاهز لـ ChatGPT وClaude: ${x.title}، ${x.for}. انسخه بكبسة وبدّل اللي بين [ ] بمعلوماتك.`;
+  const rel = prompts.filter((y) => y.category === x.category && y.slug !== x.slug).slice(0, 4);
+  const html = `${head({
+    title: `برومبت ${x.title} بالعربي لـ ChatGPT وClaude`,
+    description: desc,
+    url,
+    depth: 2,
+    jsonld: [
+      { "@context": "https://schema.org", "@type": "CreativeWork", name: x.title, description: x.for, text: x.body, inLanguage: "ar", url, license: "https://opensource.org/licenses/MIT", author: { "@type": "Person", name: "Moath Alherani", url: "https://moathalherani.com" } },
+      breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "برومبتات عربية", url: pUrl }, { name: x.title, url }]),
+    ],
+  })}
+<body>
+  ${header(2, "prompts/")}
+  <main>
+    <section class="page-head">
+      <p class="crumbs"><a href="../">برومبتات عربية</a> · ${esc(PROMPT_CATEGORIES[x.category])}</p>
+      <h1>برومبت ${esc(x.title)}</h1>
+      <p class="lead">${esc(x.for)}. برومبت عربي جاهز لـ ChatGPT وClaude وأي مساعد ذكاء اصطناعي.</p>
+    </section>
+    <section class="prompts single">
+      <article class="prompt">
+        <pre id="text">${esc(x.body)}</pre>
+        <div class="row"><button type="button" class="btn copy" id="copy">انسخ البرومبت</button><a class="btn ghost" target="_blank" rel="noopener" href="https://claude.ai/new?q=${encodeURIComponent(x.body)}">جرّبه بـ Claude</a><a class="btn ghost" target="_blank" rel="noopener" href="https://chatgpt.com/?q=${encodeURIComponent(x.body)}">جرّبه بـ ChatGPT</a></div>
+      </article>
+    </section>
+    <section class="page-body">
+      <h2>كيف تستخدمه</h2>
+      <ol class="steps">
+        <li>اكبس «انسخ البرومبت» أو افتحه مباشرة بـ Claude أو ChatGPT.</li>
+        <li>بدّل كل إشي بين [ ] بمعلوماتك: الموضوع، الجمهور، اللهجة.</li>
+        <li>إذا ما عجبتك النتيجة، اطلب «أقصر» أو «بلهجة ثانية» أو «اعطيني 3 نسخ ثانية».</li>
+      </ol>
+      <p>بدك تحسّنه؟ <a href="${REPO}/blob/main/prompts/${x.slug}.md">عدّل عليه على GitHub</a>، أو <a href="../#add">ضيف برومبتك</a> واسمك بينضاف للمساهمين.</p>
+    </section>
+    ${rel.length ? `<nav class="related" aria-label="برومبتات مشابهة"><h2>برومبتات مشابهة</h2><ul>${rel.map((y) => `<li><a href="../${y.slug}/">${esc(y.title)}</a></li>`).join("")}<li><a href="../">كل البرومبتات</a></li></ul></nav>` : ""}
+  </main>
+  ${FOOT}
+  <script type="module">
+    const b = document.getElementById("copy");
+    b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(document.getElementById("text").textContent); b.textContent = "انتسخ ✓"; setTimeout(() => (b.textContent = "انسخ البرومبت"), 1500); } catch {}
+    });
+  </script>
+</body>
+</html>
+`;
+  mkdirSync(join(out, "prompts", x.slug), { recursive: true });
+  writeFileSync(join(out, "prompts", x.slug, "index.html"), html);
+}
 
 /* home: add SEO head tags and the tools index */
 const homeUrl = BASE;
