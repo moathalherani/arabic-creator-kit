@@ -25,6 +25,8 @@ jobs:
         run: node scripts/merge-hooks.js --check
       - name: Check the prompt library in prompts/
         run: node scripts/check-prompts.js
+      - name: Auto-captions tests (Python)
+        run: python3 -m unittest discover autocaptions
       - run: node scripts/build-site.js
       - name: Pack check
         run: |

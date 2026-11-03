@@ -93,6 +93,7 @@ const NAV = [
   ["hijri/", "التاريخ الهجري"],
   ["slug/", "رابط عربي"],
   ["skills/", "Claude Skills"],
+  ["autocaptions/", "كابشن أوتوماتيك"],
   ["prompts/", "برومبتات عربية"],
   ["contribute/", "ضيف هوكك"],
 ];
@@ -325,6 +326,64 @@ const cHtml = `${head({
 `;
 mkdirSync(join(out, "contribute"), { recursive: true });
 writeFileSync(join(out, "contribute", "index.html"), cHtml);
+
+/* auto-captions page: the Colab tool in autocaptions/ */
+{
+  const url = `${BASE}autocaptions/`;
+  urls.push(url);
+  const colab = "https://colab.research.google.com/github/moathalherani/arabic-creator-kit/blob/main/autocaptions/Arabic_AutoCaptions.ipynb";
+  const desc = "كابشن عربي أوتوماتيك ومجاني لفيديوهاتك: كلمات مفتاحية محروقة على الفيديو، بيفهم اللهجات، وبيحط الإنجليزي والأرقام بترتيبها الصحيح. بيشتغل من المتصفح على Google Colab.";
+  const faq = [
+    { question: "مجاني فعلًا؟", answer: "آه. الأداة مفتوحة المصدر، وGoogle Colab بيعطيك GPU مجاني يكفي لفيديوهات الريلز. ما في اشتراك ولا علامة مائية." },
+    { question: "بيفهم لهجتي؟", answer: "بيفهم الفصحى واللهجات الأردنية والمصرية والخليجية والشامية والمغاربية بدرجات مختلفة. إذا في كلمات أو أسماء بتحكيها كثير، اكتبها بخانة الكلمات المساعدة." },
+    { question: "بقدر أعدّل الكابشن بعدين؟", answer: "آه. مع الفيديو بينزل ملف .srt وملف .ass، بتفتحهم بأي برنامج مونتاج وبتعدّل الكلمات أو التوقيت." },
+    { question: "وين بيروح الفيديو تبعي؟", answer: "على جلسة Colab الخاصة فيك على حساب Google تبعك، وبينمسح لما تسكّر الجلسة. ما بيوصلنا إشي." },
+  ];
+  const html = `${head({
+    title: "كابشن عربي أوتوماتيك مجاني للريلز وتيك توك | Arabic Creator Kit",
+    description: desc,
+    url,
+    depth: 1,
+    jsonld: [webApp("كابشن عربي أوتوماتيك", url, desc), faqJsonLd(faq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "كابشن عربي أوتوماتيك", url }])],
+  })}
+<body>
+  ${header(1, "autocaptions/")}
+  <main>
+    <section class="page-head">
+      <h1>كابشن عربي أوتوماتيك، مجانًا</h1>
+      <p class="lead">حط الفيديو، وبيرجعلك مع كابشن كلمات مفتاحية بالعربي محروق عليه، والكلمة الأقوى بلون. بدل ما تدفع اشتراك شهري لأداة كابشن، أو تكتب الكابشن كلمة كلمة.</p>
+      <div class="row"><a class="btn" href="${colab}" target="_blank" rel="noopener">افتحه بـ Google Colab</a><a class="btn ghost" href="${REPO}/tree/main/autocaptions">الكود على GitHub</a></div>
+    </section>
+    <section class="page-body">
+      <picture><source media="(max-width: 600px)" srcset="preview-mobile.png" width="720" height="400"><img class="ac-preview" src="preview.png" width="1324" height="258" alt="ثلاث لقطات من فيديو عليه كابشن عربي: مرحبا جربت iPhone، و17 لمدة 30 يوم، والنتيجة صدمتني، والكلمة الأقوى بلون أخضر"></picture>
+      <h2>شو بيعمل</h2>
+      <ul class="steps">
+        <li>بيسمع الفيديو وبيكتب الكلام بالعربي، مع وقت كل كلمة.</li>
+        <li>بيقسم الكلام لكابشن قصير، من كلمة لثلاث كلمات، بيطلع مع صوتك بالضبط.</li>
+        <li>بيلوّن الكلمة الأقوى: الأرقام أول، بعدين الكلمات الإنجليزي، بعدين أطول كلمة.</li>
+        <li>بيشيل «يعني» و«اممم»، وبيكتب الأرقام 0-9.</li>
+        <li>بيحط الكلمات الإنجليزي والأرقام بمكانها الصح جوا الجملة العربية، وهاي مشكلة معروفة ببرامج المونتاج.</li>
+      </ul>
+      <h2>3 خطوات</h2>
+      <ol class="steps">
+        <li>اكبس «افتحه بـ Google Colab»، ومن القائمة اختار Runtime ثم Change runtime type ثم T4 GPU.</li>
+        <li>اكبس ▶️ على الخلايا بالترتيب، وارفع الفيديو لما يطلب منك.</li>
+        <li>بعد دقيقة أو دقيقتين، بينزلك الفيديو جاهز مع ملف .srt.</li>
+      </ol>
+      <p>بتحب تشغّله على جهازك؟ <a href="${REPO}/tree/main/autocaptions#use-it-on-your-computer">الشرح هون</a>. بدك تحسّنه للهجتك؟ <a href="${REPO}/issues">ساهم معنا</a>.</p>
+    </section>
+    ${faqHtml(faq)}
+    ${related(1, "autocaptions/")}
+  </main>
+  ${FOOT}
+</body>
+</html>
+`;
+  mkdirSync(join(out, "autocaptions"), { recursive: true });
+  writeFileSync(join(out, "autocaptions", "index.html"), html);
+  cpSync(join(root, "autocaptions", "docs", "preview.png"), join(out, "autocaptions", "preview.png"));
+  cpSync(join(root, "autocaptions", "docs", "preview-mobile.png"), join(out, "autocaptions", "preview-mobile.png"));
+}
 
 /* prompts page: the Arabic prompt library from prompts/*.md */
 const catOrder = Object.keys(PROMPT_CATEGORIES);

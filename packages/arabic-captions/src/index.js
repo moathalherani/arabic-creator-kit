@@ -214,7 +214,7 @@ export function toAss(captions, style = {}) {
     "",
     "[V4+ Styles]",
     "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
-    `Style: Default,${font},${fontSize},${primary},${primary},&H00000000&,&H64000000&,-1,0,0,0,100,100,0,0,1,4,0,2,60,60,${marginV},1`,
+    `Style: Default,${font},${fontSize},${primary},${primary},&H00000000&,&H64000000&,-1,0,0,0,100,100,0,0,1,4,0,2,60,60,${marginV},-1`, // encoding -1: libass picks each line's base direction, so Arabic lines starting with a number stay RTL
     "",
     "[Events]",
     "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",

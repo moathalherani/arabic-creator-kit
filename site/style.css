@@ -342,3 +342,4 @@ img.contributors { max-width: 100%; height: auto; margin-top: 8px; }
 .prompts.single pre { max-height: none; font-size: 1rem; }
 .crumbs { color: var(--muted); font-size: 0.9rem; margin: 0 0 8px; }
 .crumbs a { color: var(--leaf); }
+img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16px; display: block; margin-bottom: 24px; }

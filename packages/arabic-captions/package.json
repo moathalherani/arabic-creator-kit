@@ -1,6 +1,6 @@
 {
   "name": "arabic-captions",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Turn SRT/VTT subtitles into short keyword captions for Reels, TikTok and Shorts, with correct Arabic + English (bidi) rendering, Latin digits, filler removal and ASS output for ffmpeg. Zero dependencies.",
   "type": "module",
   "main": "./src/index.js",

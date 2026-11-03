@@ -89,6 +89,7 @@ test("ASS output colors the keyword and keeps tags intact", () => {
   assert.throws(() => hexToAssColor("green"));
   const ass = toAss(keywordCaptions(parseSubtitles("1\n00:00:00,000 --> 00:00:02,000\nجرّبت BYD Seal 30 يوم\n")));
   assert.match(ass, /PlayResX: 1080/);
+  assert.match(ass, /^Style: Default,.*,-1$/m, "encoding -1 so Arabic lines keep right-to-left order");
   assert.match(ass, /Dialogue: 0,0:00:00\.00,/);
   assert.match(ass, /\{\\c&H0069B07F&\}\u206630\u2069\{\\c&H00FFFFFF&\}/);
   assert.ok(!/\u2066[^\u2069]*\{/.test(ass), "isolates never wrap override tags");
