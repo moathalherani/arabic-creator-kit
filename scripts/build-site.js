@@ -6,6 +6,7 @@ import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { faqJsonLd, breadcrumbJsonLd, jsonLdScript, hreflangHtml } from "../packages/arabic-seo/src/index.js";
 import { pages } from "./site-pages.js";
+import { readPrompts, PROMPT_CATEGORIES } from "./prompts.js";
 
 const BASE = "https://moathalherani.github.io/arabic-creator-kit/";
 const REPO = "https://github.com/moathalherani/arabic-creator-kit";
@@ -92,6 +93,7 @@ const NAV = [
   ["hijri/", "التاريخ الهجري"],
   ["slug/", "رابط عربي"],
   ["skills/", "Claude Skills"],
+  ["prompts/", "برومبتات عربية"],
   ["contribute/", "ضيف هوكك"],
 ];
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -323,6 +325,78 @@ const cHtml = `${head({
 `;
 mkdirSync(join(out, "contribute"), { recursive: true });
 writeFileSync(join(out, "contribute", "index.html"), cHtml);
+
+/* prompts page: the Arabic prompt library from prompts/*.md */
+const catOrder = Object.keys(PROMPT_CATEGORIES);
+const firstPrompts = ["hook-writer", "reel-script", "caption-writer", "youtube-titles"];
+const rank = (x) => (firstPrompts.includes(x.slug) ? firstPrompts.indexOf(x.slug) - 100 : 0);
+const prompts = readPrompts().sort((a, b) => catOrder.indexOf(a.category) - catOrder.indexOf(b.category) || rank(a) - rank(b) || a.title.localeCompare(b.title, "ar"));
+const pUrl = `${BASE}prompts/`;
+urls.push(pUrl);
+const pDesc = `${prompts.length} برومبت عربي جاهز لـ ChatGPT وClaude: هوكات، سكربت ريل، كابشن، إيميلات، لينكدإن، دراسة وأكثر. انسخه بكبسة، أو ضيف برومبتك واسمك بينضاف للمساهمين.`;
+const pFaq = [
+  { question: "شو هو البرومبت؟", answer: "هو التعليمات اللي بتكتبها لـ ChatGPT أو Claude. كل ما كان أوضح، كل ما كانت النتيجة أحسن. البرومبتات هون جاهزة، بس بدّل اللي بين [ ] بمعلوماتك." },
+  { question: "بيشتغلوا مع ChatGPT وClaude وGemini؟", answer: "آه، مع أي مساعد ذكاء اصطناعي. زر «جرّبه بـ Claude» بيفتحلك البرومبت جاهز بمحادثة جديدة." },
+  { question: "كيف بضيف برومبت؟", answer: "عبّي النموذج تحت الصفحة واكبس «افتح GitHub والملف جاهز». بعد ما ندمجه بيطلع هون، واسمك بيصير من مساهمين المشروع." },
+  { question: "مسموح أستخدمهم بشغلي؟", answer: "آه. المشروع مفتوح المصدر بترخيص MIT، استخدمهم وعدّل عليهم براحتك." },
+];
+const card = (x) => `<article class="prompt" data-cat="${x.category}" id="${x.slug}">
+        <div class="prompt-head"><span class="tag">${esc(PROMPT_CATEGORIES[x.category])}</span><h2>${esc(x.title)}</h2><p>${esc(x.for)}</p></div>
+        <pre>${esc(x.body)}</pre>
+        <div class="row"><button type="button" class="btn copy">انسخ</button><a class="btn ghost" target="_blank" rel="noopener" href="https://claude.ai/new?q=${encodeURIComponent(x.body)}">جرّبه بـ Claude</a><a class="chip" href="${REPO}/blob/main/prompts/${x.slug}.md">عدّل على GitHub</a></div>
+      </article>`;
+const pHtml = `${head({
+  title: "برومبتات عربية جاهزة لـ ChatGPT وClaude | Arabic Creator Kit",
+  description: pDesc,
+  url: pUrl,
+  depth: 1,
+  jsonld: [webApp("برومبتات عربية", pUrl, pDesc), faqJsonLd(pFaq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "برومبتات عربية", url: pUrl }])],
+})}
+<body>
+  ${header(1, "prompts/")}
+  <main>
+    <section class="page-head">
+      <h1>${prompts.length} برومبت عربي جاهز</h1>
+      <p class="lead">لـ ChatGPT وClaude وأي مساعد ذكاء اصطناعي. انسخ، بدّل اللي بين [ ] بمعلوماتك، وخلص. وإذا عندك برومبت بيشتغل معك، ضيفه واسمك بينضاف للمساهمين.</p>
+      <div class="row prompt-tools">
+        <input id="p-search" type="search" placeholder="دوّر: هوك، إيميل، دراسة…" aria-label="دوّر على برومبت">
+        <a class="btn" href="#add">ضيف برومبتك</a>
+      </div>
+      <div class="chips" id="p-cats" role="group" aria-label="الأقسام">
+        <button type="button" class="chip on" data-cat="">الكل</button>
+        ${Object.entries(PROMPT_CATEGORIES).map(([k, v]) => `<button type="button" class="chip" data-cat="${k}">${v}</button>`).join("\n        ")}
+      </div>
+    </section>
+    <section class="prompts" id="p-list">
+      ${prompts.map(card).join("\n      ")}
+    </section>
+    <section class="page-body" id="add" aria-labelledby="add-title">
+      <h2 id="add-title">ضيف برومبتك</h2>
+      <p>اكتب برومبت بتستخدمه وبيعطيك نتيجة حلوة. اكبس الزر وGitHub بيفتح والملف جاهز، بعدها Commit changes ثم Create pull request.</p>
+      <div class="scorer add-form">
+        <label class="field-label" for="a-title">العنوان</label>
+        <input id="a-title" maxlength="60" placeholder="مثلًا: كاتب وصف منتجات">
+        <div class="row">
+          <label class="stack"><span class="field-label">القسم</span><select id="a-cat">${Object.entries(PROMPT_CATEGORIES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
+          <label class="stack"><span class="field-label">لشو؟ (سطر قصير)</span><input id="a-for" maxlength="80" placeholder="وصف بيبيع للمتجر"></label>
+        </div>
+        <label class="field-label" for="a-body">البرومبت (حط [ ] حول الأشياء اللي بتتغير)</label>
+        <textarea id="a-body" rows="7" maxlength="3000"></textarea>
+        <ul class="problems" id="a-problems" aria-live="polite"></ul>
+        <div class="row"><a class="btn" id="a-go" href="#" target="_blank" rel="noopener" aria-disabled="true">افتح GitHub والملف جاهز</a></div>
+      </div>
+      <p class="note">بعض البرومبتات مستوحاة من مكتبة <a href="https://github.com/f/prompts.chat">prompts.chat</a> (ملكية عامة CC0)، ومكتوبة من جديد بالعربي لصنّاع المحتوى العرب.</p>
+    </section>
+    ${faqHtml(pFaq)}
+    ${related(1, "prompts/")}
+  </main>
+  ${FOOT}
+  <script type="module" src="../prompts.js"></script>
+</body>
+</html>
+`;
+mkdirSync(join(out, "prompts"), { recursive: true });
+writeFileSync(join(out, "prompts", "index.html"), pHtml);
 
 /* home: add SEO head tags and the tools index */
 const homeUrl = BASE;

@@ -23,6 +23,8 @@ jobs:
       - run: npm run check:skills
       - name: Check community hooks in contrib/hooks
         run: node scripts/merge-hooks.js --check
+      - name: Check the prompt library in prompts/
+        run: node scripts/check-prompts.js
       - run: node scripts/build-site.js
       - name: Pack check
         run: |

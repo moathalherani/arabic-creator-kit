@@ -19,6 +19,7 @@
     "test": "node --test packages/*/test/*.test.js",
     "check:skills": "node scripts/check-skills.js",
     "check:hooks": "node scripts/merge-hooks.js --check",
-    "check": "npm test && npm run check:skills && npm run check:hooks"
+    "check:prompts": "node scripts/check-prompts.js",
+    "check": "npm test && npm run check:skills && npm run check:hooks && npm run check:prompts"
   }
 }
