@@ -3,7 +3,7 @@ import { enter, prog, ease, card, wrapLines, text } from "../engine.js";
 function drawCard(ctx, env, y, label, body, color, mark, p, dim) {
   const w = env.W * 0.84;
   const x = (env.W - w) / 2;
-  ctx.font = `700 ${env.u * 5.6}px "${env.font}"`;
+  ctx.font = `700 ${env.u * 5.6}px ${env.font}`;
   const lines = wrapLines(ctx, body, w - env.u * 22);
   const h = env.u * 17 + lines.length * env.u * 7.2;
   ctx.save();
@@ -17,7 +17,7 @@ function drawCard(ctx, env, y, label, body, color, mark, p, dim) {
   ctx.beginPath();
   ctx.arc(bx, by, env.u * 4.5, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = "#fff";
+  ctx.strokeStyle = mark === "x" ? "#fff" : env.onAccent;
   ctx.lineWidth = env.u * 1.1;
   ctx.lineCap = "round";
   ctx.beginPath();

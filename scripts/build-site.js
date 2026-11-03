@@ -340,7 +340,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
   );
   const url = `${BASE}motion/`;
   urls.push(url);
-  const desc = "استوديو موشن جرافيك مجاني بالعربي: اختار قالب (هوك، رقم كبير، مشكلة وحل، خطوات، جوا برنامج، تابعني)، اكتب كلامك، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
+  const desc = "استوديو موشن جرافيك مجاني بالعربي: اختار قالب (هوك، رقم كبير، مشكلة وحل، خطوات، جوا برنامج، تابعني)، غيّر الخط العربي والإنجليزي والألوان، ونزّل الفيديو جاهز تحطه بـ CapCut فوق فيديوك.";
   const faq = [
     { question: "كيف بحطه على فيديوي؟", answer: "نزّل الملف وحطه بـ CapCut أو Premiere كطبقة فوق فيديوك. إذا اخترت الشاشة الخضرا، استخدم Chroma Key عشان يختفي الأخضر ويضل الموشن بس." },
     { question: "مجاني؟ في علامة مائية؟", answer: "مجاني بالكامل وبدون علامة مائية. كل إشي بيصير بمتصفحك، وما بيترفع أي ملف لأي سيرفر." },
@@ -355,7 +355,6 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
     jsonld: [webApp("استوديو الموشن", url, desc), faqJsonLd(faq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "استوديو الموشن", url }])],
   })}
 <body>
-  <link href="https://fonts.googleapis.com/css2?family=Kufam:wght@600;700;800&family=Changa:wght@600;700;800&family=Cairo:wght@600;700;800&family=Noto+Kufi+Arabic:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@600;700&display=swap" rel="stylesheet">
   ${header(1, "motion/")}
   <main>
     <section class="page-head">
@@ -368,12 +367,24 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
         <div class="tpls" id="m-templates"></div>
         <h2 class="studio-h">2. كلامك</h2>
         <div class="fields" id="m-fields"></div>
-        <h2 class="studio-h">3. الشكل</h2>
+        <h2 class="studio-h">3. المقاس والخلفية</h2>
         <div class="fields two">
           <label class="stack"><span class="field-label">المقاس</span><select id="m-format"></select></label>
           <label class="stack"><span class="field-label">الخلفية</span><select id="m-bg"></select></label>
-          <label class="stack"><span class="field-label">الخط</span><select id="m-font"></select></label>
-          <label class="stack"><span class="field-label">لونك</span><input id="m-accent" type="color"></label>
+        </div>
+        <h2 class="studio-h">4. الخطوط</h2>
+        <div class="fields two">
+          <label class="stack"><span class="field-label">الخط العربي</span><select id="m-font-ar"></select></label>
+          <label class="stack"><span class="field-label">الخط الإنجليزي والأرقام</span><select id="m-font-en"></select></label>
+        </div>
+        <h2 class="studio-h">5. الألوان</h2>
+        <div class="pals" id="m-palettes" role="group" aria-label="ألوان جاهزة"></div>
+        <div class="fields colors">
+          <label class="color"><input id="m-accent" type="color"><span>الكلمة المهمة والحل</span></label>
+          <label class="color"><input id="m-ink" type="color"><span>الكلام</span></label>
+          <label class="color"><input id="m-bgcolor" type="color"><span>الخلفية</span></label>
+          <label class="color"><input id="m-card" type="color"><span>الكروت</span></label>
+          <label class="color"><input id="m-danger" type="color"><span>الغلط</span></label>
         </div>
       </div>
       <div class="studio-preview">

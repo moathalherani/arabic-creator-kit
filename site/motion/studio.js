@@ -1,5 +1,5 @@
 // Motion Studio page: pick a template, type your words, preview and download the clip.
-import { FORMATS, BACKGROUNDS, FONTS, renderFrame } from "./engine.js";
+import { FORMATS, BACKGROUNDS, AR_FONTS, EN_FONTS, PALETTES, renderFrame } from "./engine.js";
 import templates from "./templates/index.js";
 
 const $ = (id) => document.getElementById(id);
@@ -7,11 +7,36 @@ const canvas = $("m-canvas");
 const state = {
   template: templates[0],
   props: {},
-  settings: { format: "vertical", background: "grid-light", accent: "#5F8A55", font: "Kufam" },
+  settings: { format: "vertical", background: "grid-light", fontAr: "Kufam", fontEn: "", ...PALETTES[0] },
   start: performance.now(),
   playing: true,
   recording: false,
 };
+delete state.settings.name;
+
+/* ---------- fonts: load only the ones people pick ---------- */
+const loaded = new Set();
+function ensureFont(family, weights) {
+  if (!family || loaded.has(family)) return;
+  loaded.add(family);
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}:wght@${weights}&display=swap`;
+  document.head.append(link);
+}
+async function loadFonts() {
+  const { fontAr, fontEn } = state.settings;
+  ensureFont(fontAr, AR_FONTS[fontAr]);
+  ensureFont(fontEn, EN_FONTS[fontEn]);
+  try {
+    await Promise.all([
+      document.fonts.load(`800 60px "${fontAr}"`, "عربي"),
+      document.fonts.load(`700 60px "${fontAr}"`, "عربي"),
+      fontEn ? document.fonts.load(`800 60px "${fontEn}"`, "Hook 30") : null,
+      fontEn ? document.fonts.load(`700 60px "${fontEn}"`, "Hook 30") : null,
+    ]);
+  } catch {}
+}
 
 /* ---------- controls ---------- */
 function option(value, label) {
@@ -19,17 +44,73 @@ function option(value, label) {
 }
 for (const [k, f] of Object.entries(FORMATS)) $("m-format").append(option(k, f.label));
 for (const [k, b] of Object.entries(BACKGROUNDS)) $("m-bg").append(option(k, b.label));
-for (const f of FONTS) $("m-font").append(option(f, f));
-$("m-format").value = state.settings.format;
-$("m-bg").value = state.settings.background;
-$("m-font").value = state.settings.font;
-$("m-accent").value = state.settings.accent;
+for (const f of Object.keys(AR_FONTS)) $("m-font-ar").append(option(f, f));
+for (const f of Object.keys(EN_FONTS)) $("m-font-en").append(option(f, f || "نفس الخط العربي"));
 
-for (const [id, key] of [["m-format", "format"], ["m-bg", "background"], ["m-font", "font"], ["m-accent", "accent"]]) {
+const COLOR_INPUTS = { "m-accent": "accent", "m-ink": "ink", "m-bgcolor": "bg", "m-card": "card", "m-danger": "danger" };
+function syncControls() {
+  const st = state.settings;
+  $("m-format").value = st.format;
+  $("m-bg").value = st.background;
+  $("m-font-ar").value = st.fontAr;
+  $("m-font-en").value = st.fontEn;
+  for (const [id, key] of Object.entries(COLOR_INPUTS)) $(id).value = st[key];
+  $("m-bgcolor").disabled = st.background === "green";
+}
+syncControls();
+
+for (const [id, key] of [["m-format", "format"], ["m-font-ar", "fontAr"], ["m-font-en", "fontEn"], ...Object.entries(COLOR_INPUTS)]) {
   $(id).addEventListener("input", async () => {
     state.settings[key] = $(id).value;
-    if (key === "font") await loadFont();
+    if (key === "fontAr" || key === "fontEn") await loadFonts();
+    markPalette();
     restart();
+  });
+}
+// switching the background style brings its own colors; the accent stays
+$("m-bg").addEventListener("input", () => {
+  const b = BACKGROUNDS[$("m-bg").value];
+  state.settings.background = $("m-bg").value;
+  if (b && $("m-bg").value !== "green") Object.assign(state.settings, { bg: b.bg, ink: b.ink, card: b.card });
+  syncControls();
+  markPalette();
+  restart();
+});
+
+function buildPalettes() {
+  const box = $("m-palettes");
+  box.replaceChildren();
+  for (const pal of PALETTES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pal";
+    b.title = pal.name;
+    b.innerHTML = `<i></i><i></i><i></i><span></span>`;
+    const dots = b.querySelectorAll("i");
+    dots[0].style.background = pal.bg;
+    dots[1].style.background = pal.accent;
+    dots[2].style.background = pal.ink;
+    b.querySelector("span").textContent = pal.name;
+    b.addEventListener("click", () => {
+      const { name, ...colors } = pal;
+      Object.assign(state.settings, colors);
+      if (state.settings.background === "green") state.settings.background = "grid-light";
+      const dark = parseInt(pal.bg.slice(1, 3), 16) < 80;
+      if (state.settings.background === "grid-light" && dark) state.settings.background = "grid-dark";
+      if (state.settings.background === "grid-dark" && !dark) state.settings.background = "grid-light";
+      syncControls();
+      markPalette();
+      restart();
+    });
+    box.append(b);
+  }
+  markPalette();
+}
+function markPalette() {
+  const st = state.settings;
+  [...$("m-palettes").children].forEach((b, i) => {
+    const p = PALETTES[i];
+    b.classList.toggle("on", p.accent === st.accent && p.ink === st.ink && p.bg === st.bg);
   });
 }
 
@@ -102,12 +183,6 @@ function restart() {
   state.start = performance.now();
   state.playing = true;
 }
-async function loadFont() {
-  try {
-    await document.fonts.load(`800 60px "${state.settings.font}"`, "عربي");
-    await document.fonts.load(`700 60px "${state.settings.font}"`, "عربي");
-  } catch {}
-}
 function tick(now) {
   const dur = state.template.duration;
   let t = (now - state.start) / 1000;
@@ -166,5 +241,6 @@ $("m-export").addEventListener("click", async () => {
 /* ---------- start ---------- */
 buildGallery();
 buildFields();
-await loadFont();
+buildPalettes();
+await loadFonts();
 requestAnimationFrame(tick);

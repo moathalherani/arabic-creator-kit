@@ -37,7 +37,7 @@ export default {
 Rules that keep the studio consistent:
 
 - Size everything with `env.u` so it works in 9:16, 1:1 and 16:9.
-- Use `env.theme.ink`, `env.theme.card`, `env.accent` and `env.danger`, never fixed colors, so every background works.
+- Use `env.theme.ink`, `env.theme.card`, `env.accent`, `env.onAccent` (text on the accent) and `env.danger`, never fixed colors, so every background and palette works. Use `env.font` for every `ctx.font`: it holds the English font then the Arabic one.
 - Arabic text goes through `text()` or `layoutWords()` from `engine.js`, which handle right-to-left.
 - Keep it under 6 seconds, one idea per template, and fade out at the end.
 - Check it with `npm run check:motion`.

@@ -39,7 +39,7 @@ export default {
       ctx.beginPath();
       ctx.arc(bx, by, env.u * 4, 0, Math.PI * 2);
       ctx.fill();
-      text(ctx, env, String(i + 1), bx, by + env.u * 0.3, { size: env.u * 4.6, weight: 800, color: "#fff" });
+      text(ctx, env, String(i + 1), bx, by + env.u * 0.3, { size: env.u * 4.6, weight: 800, color: env.onAccent });
       text(ctx, env, s, bx - env.u * 7, by, { size: env.u * 5.4, weight: 700, align: "right" });
       ctx.restore();
     });

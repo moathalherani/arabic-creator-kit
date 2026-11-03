@@ -16,7 +16,54 @@ export const BACKGROUNDS = {
   plain: { label: "أبيض بدون Grid", bg: "#FFFFFF", line: null, ink: "#1C1F1D", muted: "#5F6A63", card: "#F4F5F3" },
 };
 
-export const FONTS = ["Kufam", "Changa", "Noto Kufi Arabic", "Cairo", "IBM Plex Sans Arabic"];
+/** Arabic fonts (Google Fonts) and the weights to load for each. */
+export const AR_FONTS = {
+  Kufam: "500;700;800",
+  Changa: "500;700;800",
+  "Noto Kufi Arabic": "500;700;800",
+  Cairo: "500;700;800",
+  Tajawal: "500;700;800",
+  Alexandria: "500;700;800",
+  "Reem Kufi": "500;700",
+  "Readex Pro": "500;700",
+  "IBM Plex Sans Arabic": "500;700",
+  "El Messiri": "500;700",
+  Almarai: "700;800",
+};
+
+/** English fonts. "" means: use the Arabic font for English too. */
+export const EN_FONTS = {
+  "": "",
+  Montserrat: "500;700;800",
+  Poppins: "500;700;800",
+  Inter: "500;700;800",
+  "Space Grotesk": "500;700",
+  Sora: "500;700;800",
+  Manrope: "500;700;800",
+  Archivo: "500;700;800",
+  "Bebas Neue": "400",
+};
+
+/** Ready color sets: accent, text, background, cards, problem. */
+export const PALETTES = [
+  { name: "أخضر سينمائي", accent: "#5F8A55", ink: "#1C1F1D", bg: "#F6F7F5", card: "#FFFFFF", danger: "#C8453A" },
+  { name: "زيتي", accent: "#7D8B4E", ink: "#22241C", bg: "#F5F5EF", card: "#FFFFFF", danger: "#B5482F" },
+  { name: "عسلي", accent: "#C98A2E", ink: "#231D14", bg: "#FAF6EF", card: "#FFFFFF", danger: "#B53A2E" },
+  { name: "غرافيتي", accent: "#2B2E31", ink: "#16181A", bg: "#FFFFFF", card: "#F2F3F4", danger: "#C0392B" },
+  { name: "ليموني على أسود", accent: "#C6F432", ink: "#F4F6F2", bg: "#0E0F0E", card: "#191B19", danger: "#FF5A4E" },
+  { name: "أزرق ليلي", accent: "#4C8DFF", ink: "#EEF2F8", bg: "#0C111B", card: "#151C2A", danger: "#FF6B5E" },
+];
+
+function hexToRgb(hex) {
+  const m = String(hex).match(/^#?([0-9a-f]{6})$/i);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgba(hex, a) {
+  const c = hexToRgb(hex);
+  return c ? `rgba(${c[0]},${c[1]},${c[2]},${a})` : hex;
+}
 
 /* ---------- easing ---------- */
 export const ease = {
@@ -128,7 +175,7 @@ export function shake(ctx, env, t, at, strength = 1) {
  * Returns [{ word, x, y, w, i }] with x as the word's centre.
  */
 export function layoutWords(ctx, env, text, size, maxWidth, lineHeight = 1.25) {
-  ctx.font = `800 ${size}px "${env.font}"`;
+  ctx.font = `800 ${size}px ${env.font}`;
   const words = String(text).trim().split(/\s+/).filter(Boolean);
   const space = ctx.measureText(" ").width;
   const lines = [[]];
@@ -159,17 +206,30 @@ export function layoutWords(ctx, env, text, size, maxWidth, lineHeight = 1.25) {
   return out;
 }
 
-export function makeEnv(canvas, { format, background, accent, font, danger }) {
+export function makeEnv(canvas, { format, background, accent, fontAr, fontEn, font, danger, ink, bg, card }) {
   const f = FORMATS[format] ?? FORMATS.vertical;
-  const theme = BACKGROUNDS[background] ?? BACKGROUNDS["grid-light"];
+  const preset = BACKGROUNDS[background] ?? BACKGROUNDS["grid-light"];
+  const theme = { ...preset };
+  if (ink) {
+    theme.ink = ink;
+    theme.muted = rgba(ink, 0.62);
+    if (preset.line) theme.line = rgba(ink, 0.1);
+  }
+  if (bg && background !== "green") theme.bg = bg;
+  if (card) theme.card = card;
+  const ar = fontAr || font || "Kufam";
+  const stack = fontEn ? `"${fontEn}", "${ar}", sans-serif` : `"${ar}", sans-serif`;
+  const rgb = hexToRgb(accent) ?? [95, 138, 85];
+  const lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
   return {
+    onAccent: lum > 0.6 ? "#111311" : "#FFFFFF", // text/icon color that reads on the accent
     W: f.w,
     H: f.h,
     u: Math.min(f.w, f.h) / 100, // 1% of the short side
     theme,
     accent,
-    danger: danger ?? "#C8453A",
-    font,
+    danger: danger || "#C8453A",
+    font: stack,
     transparent: false,
     rtl: (s) => /[\u0600-\u06FF]/.test(String(s)),
   };
@@ -209,7 +269,7 @@ export function wrapLines(ctx, text, maxWidth) {
 
 /** Fill text, right-to-left when it has Arabic. */
 export function text(ctx, env, s, x, y, { size = 60, weight = 700, color, align = "center" } = {}) {
-  ctx.font = `${weight} ${size}px "${env.font}"`;
+  ctx.font = `${weight} ${size}px ${env.font}`;
   ctx.direction = env.rtl(s) ? "rtl" : "ltr";
   ctx.textAlign = align;
   ctx.fillStyle = color ?? env.theme.ink;

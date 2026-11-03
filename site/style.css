@@ -369,3 +369,12 @@ img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16p
 .cues li b { color: var(--leaf); font-variant-numeric: tabular-nums; min-width: 3.4em; }
 .cues li em { color: var(--muted); font-style: normal; font-size: 0.85rem; }
 @media (max-width: 860px) { .studio { grid-template-columns: 1fr; } .studio-preview { position: static; order: -1; } .canvas-wrap canvas { max-height: 60vh; } }
+.pals { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.pal { font: inherit; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--field); color: var(--ink); cursor: pointer; }
+.pal i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(127,127,127,0.35); display: inline-block; }
+.pal span { margin-inline-start: 4px; }
+.pal.on { border-color: var(--leaf); box-shadow: 0 0 0 2px var(--leaf) inset; }
+.fields.colors { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.color { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; background: var(--field); font-size: 0.9rem; }
+.color input[type="color"] { width: 36px; height: 36px; padding: 0; border: 0; background: none; flex: none; }
+.color input:disabled { opacity: 0.35; }

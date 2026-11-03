@@ -39,7 +39,7 @@ export default {
     } else {
       ctx.fillStyle = env.accent;
       ctx.fillRect(ax - r, ay - r, r * 2, r * 2);
-      text(ctx, env, String(props.name || "؟").replace(/^المهندس\s+/, "").trim().charAt(0), ax, ay + env.u, { size: env.u * 9, weight: 800, color: "#fff" });
+      text(ctx, env, String(props.name || "؟").replace(/^المهندس\s+/, "").trim().charAt(0), ax, ay + env.u, { size: env.u * 9, weight: 800, color: env.onAccent });
     }
     ctx.restore();
     ctx.strokeStyle = "#fff";
@@ -60,7 +60,7 @@ export default {
     ctx.beginPath();
     ctx.roundRect ? ctx.roundRect(-bw / 2, -bh / 2, bw, bh, bh / 2) : ctx.rect(-bw / 2, -bh / 2, bw, bh);
     ctx.fill();
-    text(ctx, env, props.cta, 0, env.u * 0.4, { size: env.u * 4.4, weight: 800, color: "#fff" });
+    text(ctx, env, props.cta, 0, env.u * 0.4, { size: env.u * 4.4, weight: 800, color: env.onAccent });
     ctx.restore();
     ctx.restore();
   },

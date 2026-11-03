@@ -32,7 +32,7 @@ export default {
       ctx.globalAlpha = Math.min(p * 1.6, 1) * out;
       ctx.translate(w.x, w.y);
       ctx.scale(s, s);
-      ctx.font = `800 ${size}px "${env.font}"`;
+      ctx.font = `800 ${size}px ${env.font}`;
       ctx.direction = env.rtl(w.word) ? "rtl" : "ltr";
       ctx.textAlign = "center";
       ctx.fillStyle = isKw ? env.accent : env.theme.ink;
