@@ -413,6 +413,7 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
         <div class="row studio-bar">
           <button type="button" class="btn" id="m-export">نزّل الفيديو</button>
           <button type="button" class="btn ghost" id="m-replay">من الأول</button>
+          <button type="button" class="btn ghost" id="m-share">شارك التصميم</button>
           <span class="studio-time" id="m-time" dir="ltr"></span>
         </div>
         <p class="studio-status" id="m-status" aria-live="polite"></p>

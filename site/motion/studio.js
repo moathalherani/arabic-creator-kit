@@ -485,7 +485,74 @@ $("m-export").addEventListener("click", async () => {
   }
 });
 
+/* ---------- share a design as a link ---------- */
+// The link holds the scenes (template + text) and the look. Images and videos stay on the device.
+function encodeDesign() {
+  const data = {
+    v: 1,
+    s: state.settings,
+    sc: state.scenes.map((sc) => ({
+      id: sc.template.id,
+      st: sc.start,
+      p: Object.fromEntries(Object.entries(sc.props).filter(([, v]) => typeof v === "string")),
+    })),
+  };
+  const bytes = new TextEncoder().encode(JSON.stringify(data));
+  let bin = "";
+  bytes.forEach((b) => (bin += String.fromCharCode(b)));
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function decodeDesign(code) {
+  const b64 = code.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b64 + "===".slice((b64.length + 3) % 4));
+  const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
+  if (!data || data.v !== 1 || !Array.isArray(data.sc)) throw new Error("bad design");
+  const scenes = data.sc
+    .map((x) => {
+      const tpl = templates.find((t) => t.id === x.id);
+      if (!tpl) return null;
+      const props = {};
+      for (const f of tpl.fields) if (f.type !== "image" && typeof x.p?.[f.key] === "string") props[f.key] = x.p[f.key].slice(0, 2000);
+      return { template: tpl, props, start: Math.max(0, Number(x.st) || 0) };
+    })
+    .filter(Boolean)
+    .slice(0, 30);
+  if (!scenes.length) throw new Error("no scenes");
+  const s = { ...defaults() };
+  for (const k of Object.keys(s)) if (typeof data.s?.[k] === "string") s[k] = data.s[k];
+  return { scenes, settings: s };
+}
+$("m-share").addEventListener("click", async () => {
+  const url = `${location.origin}${location.pathname}#d=${encodeDesign()}`;
+  try {
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+      await navigator.share({ title: "تصميمي باستوديو الموشن", url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      $("m-status").textContent = "انتسخ رابط التصميم ✓ أي حدا بيفتحه بيشوف نفس المشاهد والألوان (بدون صورك وفيديوك).";
+    }
+  } catch {
+    $("m-status").textContent = url;
+  }
+});
+function loadFromLink() {
+  const m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/);
+  if (!m) return false;
+  try {
+    const d = decodeDesign(m[1]);
+    state.scenes = d.scenes;
+    state.sel = 0;
+    state.settings = d.settings;
+    $("m-status").textContent = "فتحت تصميم حدا شاركه معك. غيّر عليه براحتك ونزّله.";
+    return true;
+  } catch {
+    $("m-status").textContent = "الرابط ناقص أو قديم، فتحتلك التصميم الافتراضي.";
+    return false;
+  }
+}
+
 /* ---------- start ---------- */
+loadFromLink();
 buildPalettes();
 syncLook();
 $("m-layout").value = state.layout;
