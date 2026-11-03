@@ -29,7 +29,7 @@
 | 💰 [`arabic-tafqeet`](packages/arabic-tafqeet) | Amounts in Arabic words for invoices and cheques (AED, SAR, JOD, EGP…) | `npx arabic-tafqeet 1500 --only` |
 | 📅 [`arabic-dates`](packages/arabic-dates) | Month names by region, Hijri (Umm al-Qura), Ramadan and Eid planning dates, «منذ دقيقتين» | `npm i arabic-dates` |
 | 🔎 [`arabic-seo`](packages/arabic-seo) | Arabic slugs, hreflang, safe JSON-LD, digit and tashkeel fixes | `npm i arabic-seo` |
-| 🧠 [`skills/`](skills) | 13 Claude Skills for Arabic content | [download](https://moathalherani.github.io/arabic-creator-kit/#skills) |
+| 🧠 [`skills/`](skills) | 14 Claude Skills for Arabic content | [download](https://moathalherani.github.io/arabic-creator-kit/#skills) |
 
 Every package: zero dependencies, Node 18+, works in the browser, ES modules with TypeScript types.
 
@@ -58,6 +58,7 @@ slugify("دليل تطبيقات BYD الكامل ٢٠٢٦");             // "د
 
 | Skill | Use it for |
 | --- | --- |
+| [`arabic-reel-designer`](skills/arabic-reel-designer/SKILL.md) | Designs a reel as motion-graphics scenes and returns a link that opens it ready in Motion Studio |
 | [`arabic-hook-writer`](skills/arabic-hook-writer/SKILL.md) | 5 hooks in your dialect, scored and improved |
 | [`arabic-reel-script`](skills/arabic-reel-script/SKILL.md) | A timed reel script with on-screen text and B-roll |
 | [`arabic-carousel`](skills/arabic-carousel/SKILL.md) | An Instagram or LinkedIn carousel, slide by slide |
@@ -91,6 +92,8 @@ Most creator tools are built for English. Arabic adds right-to-left text mixed w
 ## Motion Studio / استوديو الموشن
 
 A free motion-graphics editor for Reels in the browser: line up scenes from 18 templates (hook, big number, "I asked the AI" chat, phone notifications, top-3 ranking, bar chart, phone screen, before/after, inside the editor, compare, steps, follow me and more), add your own video and SRT captions with punch-in zooms on key words and a progress bar, pick your Arabic and English fonts and colors, and download one finished MP4 with your sound. Each template is one file in [`site/motion/templates/`](site/motion/templates/), so adding one is a small, fun first contribution. [Open the studio](https://moathalherani.github.io/arabic-creator-kit/motion/).
+
+**Design it with ChatGPT or Claude.** Type an idea in the studio, press "Design with ChatGPT" or "Design with Claude", and paste the reply: the scenes build themselves. No API keys, and it works on free plans. Or install the [`arabic-reel-designer`](skills/arabic-reel-designer/SKILL.md) Claude Skill (or make a GPT from [the same instructions](https://moathalherani.github.io/arabic-creator-kit/ai/)) and ask for a reel: you get back a link that opens the studio with everything ready.
 
 ## Arabic auto-captions / كابشن عربي أوتوماتيك
 

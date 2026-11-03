@@ -2,6 +2,7 @@
 import { FORMATS, BACKGROUNDS, AR_FONTS, EN_FONTS, PALETTES, LAYOUTS, CAPTION_STYLES, composeFrame, drawSafeZones, makeEnv } from "./engine.js";
 import templates from "./templates/index.js";
 import { parseSubtitles, keywordCaptions } from "../lib/arabic-captions/index.js";
+import { buildPrompt, parseDesign, chatLinks } from "./ai.js";
 
 const $ = (id) => document.getElementById(id);
 const canvas = $("m-canvas");
@@ -617,6 +618,59 @@ $("m-export").addEventListener("click", async () => {
     $("m-export").disabled = false;
   }
 });
+
+/* ---------- design it with ChatGPT or Claude ---------- */
+function aiPrompt() {
+  return buildPrompt(templates, $("m-ai-idea").value, { hasVideo: hasVideo() });
+}
+function updateAiLinks() {
+  const links = chatLinks(aiPrompt());
+  $("m-ai-chatgpt").href = links.chatgpt;
+  $("m-ai-claude").href = links.claude;
+}
+$("m-ai-idea").addEventListener("input", updateAiLinks);
+for (const id of ["m-ai-chatgpt", "m-ai-claude"]) {
+  $(id).addEventListener("click", () => {
+    updateAiLinks();
+    // a backup in case the chat opens empty
+    navigator.clipboard?.writeText(aiPrompt()).catch(() => {});
+    $("m-ai-status").textContent = "فتحتلك المحادثة. إذا طلعت فاضية الصق الطلب (انسخته لك). لما يرد، انسخ رده وارجع الصقه تحت.";
+  });
+}
+$("m-ai-copy").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(aiPrompt());
+    $("m-ai-status").textContent = "انتسخ الطلب ✓ الصقه بأي ذكاء اصطناعي، وارجع الصق رده تحت.";
+  } catch {
+    $("m-ai-status").textContent = "ما قدرت أنسخ. جرّب الأزرار فوق.";
+  }
+});
+function applyAi() {
+  const reply = $("m-ai-reply").value.trim();
+  if (!reply) return;
+  try {
+    const scenes = parseDesign(reply, templates);
+    const d = hasVideo() ? video.duration : Infinity;
+    let t = 0.5;
+    state.scenes = scenes.map((sc) => {
+      const start = sc.start ?? t;
+      t = Math.max(t, start) + sc.template.duration + 0.2;
+      return { template: sc.template, props: sc.props, start: Number(Math.min(start, Math.max(0, d - 1)).toFixed(1)) };
+    });
+    state.sel = 0;
+    refresh();
+    restart();
+    $("m-ai-status").textContent = `بنيت ${state.scenes.length} مشاهد ✓ عدّل الكلام براحتك ونزّل الفيديو.`;
+    $("m-scenes").scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch {
+    $("m-ai-status").textContent = "ما لقيت تصميم بالرد. تأكد إنك نسخت رده كله (الجزء اللي بين { و }).";
+  }
+}
+$("m-ai-reply").addEventListener("input", () => {
+  clearTimeout(applyAi.t);
+  applyAi.t = setTimeout(applyAi, 400);
+});
+updateAiLinks();
 
 /* ---------- share a design as a link ---------- */
 // The link holds the scenes (template + text) and the look. Images and videos stay on the device.

@@ -39,6 +39,7 @@ const AR = {
   "arabic-comment-replies": "ردود على التعليقات حسب الأولوية",
   "arabic-x-thread": "ثريد لـ X أو Threads ضمن الحد",
   "arabic-podcast-notes": "ملخص حلقة وفصول ومقاطع للريلز",
+  "arabic-reel-designer": "بيصمم ريل موشن وبيعطيك رابط بيفتحه جاهز بالاستوديو",
 };
 const skillsDir = join(root, "skills");
 const zipDir = join(out, "skills");
@@ -92,6 +93,7 @@ const NAV = [
   ["hashtags/", "الهاشتاقات"],
   ["hijri/", "التاريخ الهجري"],
   ["slug/", "رابط عربي"],
+  ["ai/", "ChatGPT وClaude"],
   ["skills/", "Claude Skills"],
   ["motion/", "استوديو الموشن"],
   ["autocaptions/", "كابشن أوتوماتيك"],
@@ -214,10 +216,10 @@ for (const p of list) {
 /* skills page */
 const skillsUrl = `${BASE}skills/`;
 urls.push(skillsUrl);
-const skillsDesc = "13 مهارة جاهزة لـ Claude بالعربي لصنّاع المحتوى: هوكس، سكربت ريل، كاروسيل، عناوين يوتيوب، لينكدإن، ثريد، كابشن، وأكثر. نزّلها مجانًا.";
+const skillsDesc = `${skills.length} مهارة جاهزة لـ Claude بالعربي لصنّاع المحتوى: هوكس، سكربت ريل، كاروسيل، عناوين يوتيوب، لينكدإن، ثريد، كابشن، ومصمم ريلز بيفتحلك الفيديو جاهز. نزّلها مجانًا.`;
 const skillsFaq = [
   { question: "شو هي Claude Skill؟", answer: "ملف تعليمات بيعلّم Claude يعمل شغلة معيّنة بطريقة ثابتة، مثل كتابة هوك أو سكربت ريل بلهجتك." },
-  { question: "كيف بركّبها بتطبيق Claude؟", answer: "نزّل ملف ZIP، وافتح Settings ثم Capabilities ثم Skills واختار Upload skill. لازم يكون Code execution مفعّل." },
+  { question: "كيف بركّبها بتطبيق Claude؟", answer: "فعّل Code execution من Settings ثم Capabilities. بعدها نزّل ملف ZIP، وافتح Customize ثم Skills، واكبس + ثم Create skill وارفع الملف." },
   { question: "وبـ Claude Code؟", answer: "انسخ مجلد الـ Skill لـ ~/.claude/skills، وClaude بيستخدمه لحاله لما يلزم." },
 ];
 const skillsHtml = `${head({
@@ -231,7 +233,7 @@ const skillsHtml = `${head({
   ${header(1, "skills/")}
   <main>
     <section class="page-head">
-      <h1>13 مهارة جاهزة لـ Claude بالعربي</h1>
+      <h1>${skills.length} مهارة جاهزة لـ Claude بالعربي</h1>
       <p class="lead">كل مهارة (Skill) بتعلّم Claude يكتب نوع محتوى معيّن بلهجتك وبقواعد واضحة. نزّل اللي بدك ياها أو نزّلهم كلهم.</p>
       <a class="btn" href="arabic-creator-skills.zip" download>نزّل الكل</a>
     </section>
@@ -248,6 +250,88 @@ const skillsHtml = `${head({
 </html>
 `;
 writeFileSync(join(zipDir, "index.html"), skillsHtml);
+
+/* ChatGPT + Claude page: the in-studio prompt, the reel-designer Claude Skill and a ready GPT */
+{
+  const dir = join(out, "ai");
+  mkdirSync(dir, { recursive: true });
+  const skillDir = join(skillsDir, "arabic-reel-designer");
+  cpSync(join(skillDir, "scripts", "make_link.py"), join(dir, "make_link.py"));
+  // GPT instructions: the skill body, pointed at the file uploaded as Knowledge (max 8000 characters)
+  const body = readFileSync(join(skillDir, "SKILL.md"), "utf8")
+    .replace(/^---[\s\S]*?---\n/, "")
+    .replace(/<!-- templates:start -->[\s\S]*<!-- templates:end -->/, "")
+    .replace("python3 scripts/make_link.py design.json", "python3 /mnt/data/make_link.py design.json (make_link.py is in your Knowledge files)");
+  const tplDir = join(root, "site", "motion", "templates");
+  const tplLines = [];
+  for (const f of readdirSync(tplDir).filter((f) => f.endsWith(".js") && f !== "index.js").sort()) {
+    const t = (await import(join(tplDir, f))).default;
+    tplLines.push(`- ${t.id} (${t.name}): ${t.fields.filter((x) => x.type !== "image").map((x) => `${x.key} = ${x.label}`).join("; ") || "no text"}`);
+  }
+  const gpt = `${body.trim()}\n${tplLines.join("\n")}\n`;
+  if (gpt.length > 8000) throw new Error(`GPT instructions are ${gpt.length} characters (max 8000)`);
+  writeFileSync(join(dir, "chatgpt-instructions.txt"), gpt);
+
+  const url = `${BASE}ai/`;
+  urls.push(url);
+  const desc = "اربط أدوات صناع المحتوى العربي بـ ChatGPT وClaude: اكتب فكرة، والذكاء الاصطناعي بيصمم الريل كامل وبيفتحلك إياه جاهز باستوديو الموشن. مجاني وبدون مفاتيح API.";
+  const faq = [
+    { question: "لازم اشتراك مدفوع؟", answer: "لا. زر «صمّم بـ ChatGPT» أو «صمّم بـ Claude» بالاستوديو بيشتغل مع الحسابات المجانية. الـ Skill بتحتاج Code execution مفعّل بـ Claude، وعمل GPT خاص بيحتاج حساب ChatGPT بيسمح بإنشاء GPTs." },
+    { question: "بتشوف الأداة فيديوهاتي أو حسابي؟", answer: "لا. الذكاء الاصطناعي بيكتب نص التصميم بس. فيديوك وصورك بيضلوا على جهازك، وما بينرفعوا لأي مكان." },
+    { question: "شو بيطلعلي بالآخر؟", answer: "رابط بيفتح استوديو الموشن والمشاهد مكتوبة وجاهزة. بتضيف فيديوك والكابشن إذا بدك، وبتنزّل MP4." },
+  ];
+  writeFileSync(
+    join(dir, "index.html"),
+    `${head({ title: "صمّم ريلز بـ ChatGPT وClaude مجانًا | Arabic Creator Kit", description: desc, url, depth: 1, jsonld: [webApp("مصمم الريلز بالذكاء الاصطناعي", url, desc), faqJsonLd(faq), breadcrumbJsonLd([{ name: "Arabic Creator Kit", url: BASE }, { name: "ChatGPT وClaude", url }])] })}
+<body>
+  ${header(1, "ai/")}
+  <main>
+    <section class="page-head">
+      <h1>اكتب فكرة، والذكاء الاصطناعي بيصمملك الريل</h1>
+      <p class="lead">ChatGPT أو Claude بيكتب المشاهد والكلام، والاستوديو بيحوّلها لموشن جرافيك جاهز للتنزيل. 3 طرق، اختار الأسهل إلك.</p>
+    </section>
+    <section class="ai-ways">
+      <article class="ai-way">
+        <span class="tag">بدون تركيب</span>
+        <h2>من جوا الاستوديو</h2>
+        <p>اكتب فكرتك، اكبس «صمّم بـ ChatGPT» أو «صمّم بـ Claude»، وانسخ رده والصقه. المشاهد بتنبني لحالها.</p>
+        <a class="btn" href="../motion/#ai">افتح الاستوديو</a>
+      </article>
+      <article class="ai-way">
+        <span class="tag">Claude</span>
+        <h2>مهارة «مصمم الريلز» لـ Claude</h2>
+        <ol>
+          <li>فعّل Code execution من Settings ثم Capabilities.</li>
+          <li>نزّل الملف، وافتح Customize ثم Skills، واكبس + ثم Create skill وارفعه.</li>
+          <li>اكتبله «صمملي ريل عن…»، وبيعطيك رابط بيفتح الاستوديو والمشاهد جاهزة.</li>
+        </ol>
+        <a class="btn" href="../skills/arabic-reel-designer.zip" download>نزّل المهارة</a>
+      </article>
+      <article class="ai-way">
+        <span class="tag">ChatGPT</span>
+        <h2>GPT خاص فيك</h2>
+        <ol>
+          <li>افتح <a href="https://chatgpt.com/gpts/editor" target="_blank" rel="noopener">محرر GPTs</a> واختار Configure.</li>
+          <li>سمّيه «مصمم الريلز العربي» والصق التعليمات بخانة Instructions.</li>
+          <li>ارفع make_link.py بخانة Knowledge، وفعّل Code Interpreter.</li>
+          <li>اكبس Create. إذا خليته Public، أي حدا بيقدر يلاقيه ويستخدمه.</li>
+        </ol>
+        <div class="row ai-actions"><a class="btn" href="chatgpt-instructions.txt" download>التعليمات</a><a class="btn ghost" href="make_link.py" download>make_link.py</a></div>
+      </article>
+    </section>
+    <section class="page-body">
+      <h2>وكمان</h2>
+      <p>كل برومبت بـ<a href="../prompts/">مكتبة البرومبتات</a> بيفتح بـ ChatGPT أو Claude بكبسة، وفي <a href="../skills/">${skills.length} مهارة لـ Claude</a> للهوكس والسكربت والكاروسيل وأكثر.</p>
+    </section>
+    ${faqHtml(faq)}
+    ${related(1, "ai/")}
+  </main>
+  ${FOOT}
+</body>
+</html>
+`,
+  );
+}
 
 /* contribute page: write a hook, open GitHub with the file ready */
 const cUrl = `${BASE}contribute/`;
@@ -363,6 +447,19 @@ writeFileSync(join(out, "contribute", "index.html"), cHtml);
     </section>
     <section class="studio">
       <div class="studio-controls">
+        <div class="ai-box" id="ai">
+          <h2 class="studio-h">خلّي ChatGPT أو Claude يصمملك الفيديو</h2>
+          <label class="field-label" for="m-ai-idea">فكرة الفيديو أو السكربت تبعك</label>
+          <textarea id="m-ai-idea" rows="3" placeholder="مثلاً: 3 أخطاء بتخرب الهوك تبعك"></textarea>
+          <div class="row ai-actions">
+            <a class="btn" id="m-ai-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener">صمّم بـ ChatGPT</a>
+            <a class="btn" id="m-ai-claude" href="https://claude.ai/new" target="_blank" rel="noopener">صمّم بـ Claude</a>
+            <button type="button" class="chip" id="m-ai-copy">انسخ الطلب بس</button>
+          </div>
+          <label class="field-label" for="m-ai-reply">الصق رده هون، والمشاهد بتنبني لحالها</label>
+          <textarea id="m-ai-reply" rows="3" dir="auto" placeholder='{"scenes":[…]}'></textarea>
+          <p class="studio-status" id="m-ai-status" aria-live="polite"></p>
+        </div>
         <h2 class="studio-h">1. المشاهد</h2>
         <div class="scenes" id="m-scenes"></div>
         <div class="row scene-actions">

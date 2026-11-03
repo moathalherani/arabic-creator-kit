@@ -403,3 +403,12 @@ img.ac-preview { width: 100%; max-width: 900px; height: auto; border-radius: 16p
 .note .chip { margin-inline-start: 6px; }
 .fields.fx .check { white-space: normal; color: var(--ink); align-items: flex-start; line-height: 1.5; }
 .fields.fx .check input { margin-top: 5px; accent-color: var(--leaf); }
+.ai-box { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--leaf); border-radius: 16px; background: var(--field); margin-bottom: 8px; }
+.ai-box .studio-h { margin: 0 0 4px; color: var(--ink); }
+.ai-actions { flex-wrap: wrap; gap: 8px; }
+.ai-ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 48px); }
+.ai-way { border: 1px solid var(--line); border-radius: 18px; padding: 20px; background: var(--field); display: grid; gap: 10px; align-content: start; }
+.ai-way h2 { margin: 0; font-size: 1.2rem; }
+.ai-way ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; color: var(--muted); }
+.ai-way .tag { justify-self: start; background: var(--leaf-soft); color: var(--leaf); border-radius: 999px; padding: 3px 10px; font-size: 0.8rem; font-weight: 600; }
+.ai-way .btn { justify-self: start; }

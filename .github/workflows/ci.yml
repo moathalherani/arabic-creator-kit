@@ -26,7 +26,7 @@ jobs:
       - name: Check the prompt library in prompts/
         run: node scripts/check-prompts.js
       - name: Check Motion Studio templates
-        run: node scripts/check-motion.js
+        run: node scripts/check-motion.js && node scripts/sync-reel-skill.js --check
       - name: Auto-captions tests (Python)
         run: python3 -m unittest discover autocaptions
       - run: node scripts/build-site.js
