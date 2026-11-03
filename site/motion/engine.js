@@ -210,13 +210,14 @@ export function makeEnv(canvas, { format, background, accent, fontAr, fontEn, fo
   const f = size ?? FORMATS[format] ?? FORMATS.vertical;
   const preset = BACKGROUNDS[background] ?? BACKGROUNDS["grid-light"];
   const theme = { ...preset };
-  if (ink) {
+  const green = background === "green"; // chroma key: keep solid preset colors so it keys cleanly
+  if (ink && !green) {
     theme.ink = ink;
     theme.muted = rgba(ink, 0.62);
     if (preset.line) theme.line = rgba(ink, 0.1);
   }
   if (bg && background !== "green") theme.bg = bg;
-  if (card) theme.card = card;
+  if (card && !green) theme.card = card;
   const ar = fontAr || font || "Kufam";
   const stack = fontEn ? `"${fontEn}", "${ar}", sans-serif` : `"${ar}", sans-serif`;
   const rgb = hexToRgb(accent) ?? [95, 138, 85];
@@ -262,7 +263,7 @@ export const LAYOUTS = {
 
 /** Where the video and the motion go for a layout. */
 export function layoutRects(layout, W, H) {
-  const vertical = H >= W;
+  const vertical = H > W; // square uses the side-by-side layouts so the motion area stays big
   const r = (x, y, w, h) => ({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
   if (layout === "full") return { video: r(0, 0, W, H), motion: r(0, 0, W, H) };
   if (layout === "bottom") {
@@ -552,8 +553,12 @@ export function wrapLines(ctx, text, maxWidth) {
 }
 
 /** Fill text, right-to-left when it has Arabic. */
-export function text(ctx, env, s, x, y, { size = 60, weight = 700, color, align = "center" } = {}) {
+export function text(ctx, env, s, x, y, { size = 60, weight = 700, color, align = "center", maxWidth } = {}) {
   ctx.font = `${weight} ${size}px ${env.font}`;
+  // shrink to fit instead of running off the frame (or past maxWidth)
+  const room = maxWidth ?? (align === "right" ? x - env.W * 0.04 : align === "left" ? env.W * 0.96 - x : Math.min(env.W * 0.92, 2 * Math.min(x, env.W - x) - env.W * 0.04));
+  const w = ctx.measureText(String(s ?? "")).width;
+  if (room > 0 && w > room && x >= 0 && x <= env.W) ctx.font = `${weight} ${Math.max(size * 0.45, (size * room) / w)}px ${env.font}`;
   ctx.direction = env.rtl(s) ? "rtl" : "ltr";
   ctx.textAlign = align;
   ctx.fillStyle = color ?? env.theme.ink;

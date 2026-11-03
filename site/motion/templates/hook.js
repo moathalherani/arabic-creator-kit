@@ -18,13 +18,14 @@ export default {
     const words = layoutWords(ctx, env, props.text, size, env.W * 0.82);
     const kw = String(props.keyword || "").trim();
     const kwIndex = words.findIndex((w) => kw && w.word.replace(/[.,،…!?؟]/g, "").includes(kw));
-    const kwAt = 0.25 + Math.max(0, kwIndex) * 0.12;
+    const step = Math.min(0.12, 1.9 / Math.max(1, words.length)); // long hooks: faster so every word lands
+    const kwAt = 0.25 + Math.max(0, kwIndex) * step;
     ctx.save();
     enter(ctx, env, t);
     if (kwIndex >= 0) shake(ctx, env, t, kwAt, 1.2);
     const out = 1 - prog(t, 2.85, 0.35);
     for (const w of words) {
-      const p = prog(t, 0.25 + w.i * 0.12, 0.28);
+      const p = prog(t, 0.25 + w.i * step, 0.28);
       if (p <= 0) continue;
       const isKw = w.i === kwIndex;
       const s = 1 + (1 - ease.back(p)) * 0.45;

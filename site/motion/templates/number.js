@@ -15,10 +15,12 @@ export default {
     { t: 1.3, sfx: "Impact", note: "لما يوقف الرقم" },
   ],
   draw(ctx, t, props, env) {
-    const target = Number(String(props.number).replace(/[^\d.-]/g, "")) || 0;
-    const decimals = (String(props.number).split(".")[1] || "").length;
+    const raw = String(props.number ?? "").replace(/[\u0660-\u0669]/g, (d) => d.charCodeAt(0) - 0x660).replace(/[\u06F0-\u06F9]/g, (d) => d.charCodeAt(0) - 0x6f0).replace(/٫/g, ".");
+    const clean = raw.replace(/[^0-9.-]/g, "");
+    const target = Number(clean) || 0;
+    const decimals = (clean.split(".")[1] || "").length;
     const p = ease.out(prog(t, 0.3, 1.0));
-    const value = (target * p).toFixed(decimals);
+    const value = (target * p).toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     const out = 1 - prog(t, 2.85, 0.35);
     ctx.save();
     enter(ctx, env, t);

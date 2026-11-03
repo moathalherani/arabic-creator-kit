@@ -25,11 +25,38 @@ function saveStyle() {
     localStorage.setItem(STYLE_KEY, JSON.stringify(state.settings));
   } catch {}
 }
+const SCENES_KEY = "motion-studio-scenes-v1";
+let saveTimer;
+/** Scenes and their text stay on this device (images and videos don't). */
+function saveScenes() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(SCENES_KEY, JSON.stringify(state.scenes.map((sc) => ({ id: sc.template.id, st: sc.start, p: textProps(sc.props) }))));
+    } catch {}
+  }, 300);
+}
+const textProps = (props) => Object.fromEntries(Object.entries(props).filter(([, v]) => typeof v === "string"));
+function loadScenes() {
+  try {
+    const list = JSON.parse(localStorage.getItem(SCENES_KEY) || "null");
+    if (!Array.isArray(list)) return null;
+    const scenes = list
+      .map((x) => {
+        const tpl = templates.find((t) => t.id === x.id);
+        return tpl ? { template: tpl, props: { ...(x.p ?? {}) }, start: Math.max(0, Number(x.st) || 0) } : null;
+      })
+      .filter(Boolean);
+    return scenes.length ? scenes : null;
+  } catch {
+    return null;
+  }
+}
 
 const newScene = (template, start = 0) => ({ template, props: {}, start });
 const state = {
   settings: loadStyle(),
-  scenes: [newScene(templates[0], 0.5)],
+  scenes: loadScenes() ?? [newScene(templates[0], 0.5)],
   sel: 0,
   layout: "none",
   captions: null,
@@ -68,7 +95,9 @@ video.playsInline = true;
 video.loop = true;
 video.preload = "auto";
 let audio = null;
-const hasVideo = () => state.layout !== "none" && !!video.src && video.readyState >= 2;
+let videoReady = false; // stays true while seeking, so the timing doesn't flip to "no video"
+let videoUrl = "";
+const hasVideo = () => state.layout !== "none" && videoReady && Number.isFinite(video.duration);
 
 /* ---------- timing ---------- */
 // Without a video the scenes play one after the other; with a video each scene has its own start.
@@ -120,6 +149,7 @@ $("m-capstyle").addEventListener("input", () => {
 const COLOR_INPUTS = { "m-accent": "accent", "m-ink": "ink", "m-bgcolor": "bg", "m-card": "card", "m-danger": "danger" };
 function syncLook() {
   const st = state.settings;
+  document.querySelector(".studio").classList.toggle("wide", st.format === "landscape");
   $("m-format").value = st.format;
   $("m-bg").value = st.background;
   $("m-font-ar").value = st.fontAr;
@@ -134,6 +164,7 @@ for (const [id, key] of [["m-format", "format"], ["m-font-ar", "fontAr"], ["m-fo
   $(id).addEventListener("input", async () => {
     state.settings[key] = $(id).value;
     if (key === "fontAr" || key === "fontEn") await loadFonts();
+    if (key === "format") document.querySelector(".studio").classList.toggle("wide", state.settings.format === "landscape");
     saveStyle();
     markPalette();
   });
@@ -141,10 +172,23 @@ for (const [id, key] of [["m-format", "format"], ["m-font-ar", "fontAr"], ["m-fo
 $("m-bg").addEventListener("input", () => {
   const b = BACKGROUNDS[$("m-bg").value];
   state.settings.background = $("m-bg").value;
-  if (b && $("m-bg").value !== "green") Object.assign(state.settings, { bg: b.bg, ink: b.ink, card: b.card });
+  if (b && $("m-bg").value !== "green") {
+    Object.assign(state.settings, { bg: b.bg, ink: b.ink, card: b.card });
+    // keep the accent readable on the new background
+    const lum = luminance(state.settings.accent);
+    const dark = luminance(b.bg) < 0.4;
+    if (!dark && lum > 0.62) state.settings.accent = PALETTES[0].accent;
+    if (dark && lum < 0.2) state.settings.accent = PALETTES[4].accent;
+  }
   saveStyle();
   syncLook();
 });
+function luminance(hex) {
+  const m = String(hex).match(/^#?([0-9a-f]{6})$/i);
+  if (!m) return 0.5;
+  const n = parseInt(m[1], 16);
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+}
 function buildPalettes() {
   const box = $("m-palettes");
   box.replaceChildren();
@@ -162,8 +206,11 @@ function buildPalettes() {
     b.addEventListener("click", () => {
       const { name, ...colors } = pal;
       Object.assign(state.settings, colors);
-      const dark = parseInt(pal.bg.slice(1, 3), 16) < 80;
-      if (state.settings.background !== "plain") state.settings.background = dark ? "grid-dark" : "grid-light";
+      const dark = luminance(pal.bg) < 0.4;
+      if (state.settings.background !== "green") {
+        if (state.settings.background === "plain" && !dark) state.settings.background = "plain";
+        else state.settings.background = dark ? "grid-dark" : "grid-light";
+      }
       saveStyle();
       syncLook();
     });
@@ -187,12 +234,14 @@ $("m-reset-style").addEventListener("click", () => {
 /* ---------- scenes ---------- */
 function buildScenes() {
   const box = $("m-scenes");
+  const hadFocus = box.contains(document.activeElement);
   box.replaceChildren();
   const starts = sceneStarts();
   state.scenes.forEach((s, i) => {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "scene" + (i === state.sel ? " on" : "");
+    b.setAttribute("aria-pressed", String(i === state.sel));
     b.innerHTML = "<b></b><span dir='ltr'></span>";
     b.querySelector("b").textContent = `${i + 1}. ${s.template.name}`;
     b.querySelector("span").textContent = `${starts[i].toFixed(1)}s`;
@@ -203,8 +252,10 @@ function buildScenes() {
     });
     box.append(b);
   });
+  if (hadFocus) box.querySelector(".on")?.focus();
   $("m-del-scene").disabled = state.scenes.length < 2;
   buildTimeline();
+  saveScenes();
 }
 $("m-add-scene").addEventListener("click", () => {
   const last = state.scenes.at(-1);
@@ -254,7 +305,7 @@ function buildTimeline() {
   bar.append(head);
 }
 $("m-timeline").addEventListener("click", (e) => {
-  if (!hasVideo()) return;
+  if (!hasVideo() || state.recording) return;
   const r = $("m-timeline").getBoundingClientRect();
   const x = getComputedStyle($("m-timeline")).direction === "rtl" ? r.right - e.clientX : e.clientX - r.left;
   seek((x / r.width) * video.duration);
@@ -263,22 +314,26 @@ $("m-timeline").addEventListener("click", (e) => {
 /* ---------- template + fields for the selected scene ---------- */
 function buildGallery() {
   const g = $("m-templates");
+  const hadFocus = g.contains(document.activeElement);
   g.replaceChildren();
   for (const tpl of templates) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "tpl" + (tpl === scene().template ? " on" : "");
+    b.setAttribute("aria-pressed", String(tpl === scene().template));
     b.innerHTML = "<b></b><span></span>";
     b.querySelector("b").textContent = tpl.name;
     b.querySelector("span").textContent = tpl.description;
     b.addEventListener("click", () => {
+      const old = scene().props;
       scene().template = tpl;
-      scene().props = {};
+      scene().props = Object.fromEntries(tpl.fields.filter((f) => old[f.key] !== undefined).map((f) => [f.key, old[f.key]]));
       refresh();
       if (!hasVideo()) restart();
     });
     g.append(b);
   }
+  if (hadFocus) g.querySelector(".on")?.focus();
 }
 function buildFields() {
   const s = scene();
@@ -305,12 +360,19 @@ function buildFields() {
     }
     if (f.type !== "image") {
       if (s.props[f.key] === undefined) s.props[f.key] = input.value;
-      input.addEventListener("input", () => (s.props[f.key] = input.value));
+      input.addEventListener("input", () => {
+        s.props[f.key] = input.value;
+        saveScenes();
+      });
     }
     box.append(label, input);
   }
   $("m-start-row").hidden = !hasVideo();
   $("m-start").value = s.start;
+  buildCues();
+}
+function buildCues() {
+  const s = scene();
   const starts = sceneStarts();
   $("m-cues").replaceChildren(
     ...s.template.cues.map((c) => {
@@ -326,6 +388,7 @@ function buildFields() {
 $("m-start").addEventListener("input", () => {
   scene().start = Math.max(0, Number($("m-start").value) || 0);
   buildScenes();
+  buildCues();
 });
 
 function refresh() {
@@ -350,19 +413,50 @@ $("m-video").addEventListener("change", () => {
       const src = actx.createMediaElementSource(video);
       const dest = actx.createMediaStreamDestination();
       src.connect(dest);
+      src.connect(actx.destination); // so you hear yourself in the preview too
       audio = { ctx: actx, dest };
     } catch {
       audio = null;
     }
   }
-  video.src = URL.createObjectURL(file);
-  video.onloadeddata = () => {
+  const first = !videoReady;
+  videoReady = false;
+  if (videoUrl) URL.revokeObjectURL(videoUrl);
+  videoUrl = URL.createObjectURL(file);
+  video.src = videoUrl;
+  $("m-video-info").textContent = "عم بفتح الفيديو…";
+  video.onerror = () => {
+    videoReady = false;
+    $("m-video-info").textContent = "ما قدرت أفتح هالفيديو. جرّب MP4 أو MOV.";
+    refresh();
+  };
+  video.onloadeddata = async () => {
+    // videos recorded in the browser can report an endless duration until you seek to the end
+    if (!Number.isFinite(video.duration)) {
+      video.currentTime = 1e9;
+      await Promise.race([new Promise((r) => (video.ondurationchange = () => Number.isFinite(video.duration) && r())), new Promise((r) => setTimeout(r, 4000))]);
+      if (!Number.isFinite(video.duration)) {
+        $("m-video-info").textContent = "ما قدرت أعرف طول هالفيديو. صدّره MP4 وجرّب مرة تانية.";
+        return;
+      }
+      video.ondurationchange = null;
+      video.currentTime = 0;
+    }
+    videoReady = true;
     if (state.layout === "none") state.layout = "bottom";
     $("m-layout").value = state.layout;
-    // give the scenes starts spread over the video
-    const step = video.duration / (state.scenes.length + 1);
-    state.scenes.forEach((s, i) => (s.start = Number((i === 0 ? 0.5 : step * (i + 0.5)).toFixed(1))));
-    $("m-video-info").textContent = `${file.name} · ${video.duration.toFixed(1)}s`;
+    const d = video.duration;
+    if (first || state.scenes.some((s) => s.start >= d)) {
+      // one after the other, each for its own length, so scenes don't sit on top of each other
+      const need = state.scenes.reduce((a, s) => a + s.template.duration, 0);
+      const gap = Math.max(0, (d - 0.5 - need) / Math.max(1, state.scenes.length));
+      let t = 0.5;
+      for (const s of state.scenes) {
+        s.start = Number(Math.min(t, Math.max(0, d - 1)).toFixed(1));
+        t += s.template.duration + gap;
+      }
+    }
+    $("m-video-info").textContent = `${file.name} · ${d.toFixed(1)}s`;
     refresh();
     restart();
   };
@@ -372,6 +466,7 @@ $("m-srt").addEventListener("change", async () => {
   if (!file) return;
   try {
     const cues = parseSubtitles(await file.text());
+    if (!cues.length) throw new Error("no cues");
     state.captions = keywordCaptions(cues, { maxWords: 3 });
     $("m-srt-info").textContent = `${state.captions.length} كابشن ✓`;
     $("m-srt-clear").hidden = false;
@@ -394,6 +489,8 @@ function seek(t) {
   video.currentTime = Math.max(0, Math.min(t, video.duration || 0));
 }
 function restart() {
+  if (state.recording) return;
+  audio?.ctx.resume().catch(() => {});
   state.start = performance.now();
   if (hasVideo()) {
     seek(0);
@@ -433,7 +530,7 @@ function tick(now) {
 /* ---------- export ---------- */
 function pickMime(withAudio) {
   const types = [
-    ...(withAudio ? ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4;codecs=avc1,mp4a.40.2"] : []),
+    ...(withAudio ? ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4;codecs=avc1,mp4a.40.2", "video/mp4;codecs=avc1.640028,opus", "video/webm;codecs=vp9,opus"] : []),
     "video/mp4;codecs=avc1.640028",
     "video/mp4;codecs=avc1",
     "video/mp4",
@@ -452,6 +549,16 @@ function download(chunks, mime, name) {
   a.remove();
   return ext;
 }
+/** While recording, nothing that changes the frame can be touched. */
+function lock(on) {
+  document.querySelector(".studio-controls").inert = on;
+  for (const id of ["m-replay", "m-share", "m-play-scene"]) $(id).disabled = on;
+  document.addEventListener("visibilitychange", warnHidden);
+  if (!on) document.removeEventListener("visibilitychange", warnHidden);
+}
+function warnHidden() {
+  if (document.hidden && state.recording) $("m-status").textContent = "خليك على هالصفحة لحد ما يخلص التسجيل، وإلا بيوقف الفيديو.";
+}
 async function record(withVideo) {
   const mime = pickMime(withVideo);
   if (!mime || !canvas.captureStream) {
@@ -468,6 +575,7 @@ async function record(withVideo) {
   rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
   const done = new Promise((r) => (rec.onstop = r));
   state.recording = true;
+  lock(true);
   const total = totalLength();
   let timer;
   if (withVideo) {
@@ -475,7 +583,7 @@ async function record(withVideo) {
     video.muted = false;
     seek(0);
     await new Promise((r) => (video.onseeked = r));
-    rec.start();
+    rec.start(1000);
     await video.play();
     timer = setInterval(() => ($("m-status").textContent = `بسجّل… ${Math.round((video.currentTime / video.duration) * 100)}%`), 200);
     await new Promise((r) => (video.onended = r));
@@ -483,7 +591,7 @@ async function record(withVideo) {
     video.loop = true;
   } else {
     state.start = performance.now();
-    rec.start();
+    rec.start(1000);
     timer = setInterval(() => ($("m-status").textContent = `بسجّل… ${Math.min(100, Math.round(((performance.now() - state.start) / 1000 / total) * 100))}%`), 200);
     await new Promise((r) => setTimeout(r, total * 1000 + 100));
   }
@@ -492,15 +600,20 @@ async function record(withVideo) {
   await done;
   clearInterval(timer);
   state.recording = false;
+  lock(false);
   const ext = download(chunks, mime, withVideo ? "motion-video" : "motion");
-  $("m-status").textContent = ext === "mp4" ? "نزل الفيديو ✓" : "نزل الفيديو ✓ (WebM: CapCut وPremiere بيفتحوه)";
+  $("m-status").textContent = ext === "mp4" ? "نزل الفيديو ✓" : "نزل الفيديو ✓ (WebM: CapCut بيفتحه. للنشر المباشر جرّب Chrome على الكمبيوتر)";
   restart();
 }
 $("m-export").addEventListener("click", async () => {
   $("m-export").disabled = true;
   try {
     await record(hasVideo());
+  } catch {
+    $("m-status").textContent = "صار خطأ بالتسجيل. جرّب مرة تانية بـ Chrome على الكمبيوتر.";
   } finally {
+    state.recording = false;
+    lock(false);
     $("m-export").disabled = false;
   }
 });
@@ -514,7 +627,7 @@ function encodeDesign() {
     sc: state.scenes.map((sc) => ({
       id: sc.template.id,
       st: sc.start,
-      p: Object.fromEntries(Object.entries(sc.props).filter(([, v]) => typeof v === "string")),
+      p: textProps(sc.props),
     })),
   };
   const bytes = new TextEncoder().encode(JSON.stringify(data));
@@ -563,6 +676,7 @@ function loadFromLink() {
     state.scenes = d.scenes;
     state.sel = 0;
     state.settings = d.settings;
+    history.replaceState(null, "", location.pathname + location.search);
     $("m-status").textContent = "فتحت تصميم حدا شاركه معك. غيّر عليه براحتك ونزّله.";
     return true;
   } catch {
